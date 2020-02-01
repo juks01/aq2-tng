@@ -244,7 +244,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\Debug\gamex86.dll c:\quake2\action\gamex86.dll</Command>
+      <Command>copy .\Debug\gamex86.dll D:\Pelit\UAQ2\Data\action\gamex86.dll</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying DLL to Quake2\action.</Message>

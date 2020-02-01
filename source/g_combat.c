@@ -593,19 +593,59 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			}
 			else if (z_rel < LEG_DAMAGE)
 			{
-				damage_type = LOC_LDAM;
-				damage = damage * .25;
-				if (attacker->client)
+				// If legdmg with slippers -JukS-
+				if (INV_AMMO(targ, SLIP_NUM) && mod != MOD_KNIFE
+					&& mod != MOD_KNIFE_THROWN && mod != MOD_SNIPER)
 				{
-					strcpy( attacker->client->last_damaged_players, client->pers.netname );
-					Stats_AddHit( attacker, mod, LOC_LDAM );
-					gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n",
-						client->pers.netname);
+					if (attacker->client)
+					{
+						gi.cprintf(attacker, PRINT_HIGH, "%s has a Greaves - AIM HIGHER!\n",
+							targ->client->pers.netname);
+						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed most of %s's shot\n",
+							attacker->client->pers.netname);
+					}
+					gi.sound(targ, CHAN_ITEM, gi.soundindex("misc/vest.wav"), 1,
+						ATTN_NORM, 0);
+					damage = (int)(damage / 10);
+					damage_type = LOC_KVLR_LEGS;
+					bleeding = 0;
+					instant_dam = 1;
+					stopAP = 1;
+					do_sparks = 1;
 				}
+				else if (INV_AMMO(targ, SLIP_NUM) && mod == MOD_SNIPER)
+				{
+					if (attacker->client)
+					{
+						gi.cprintf(attacker, PRINT_HIGH, "%s has Greaves, too bad you have AP rounds...\n",
+							targ->client->pers.netname);
+						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
+							attacker->client->pers.netname);
+					}
+					damage = damage * .225;
+					damage_type = LOC_KVLR_LEGS;
+					bleeding = 0;
+					instant_dam = 1;
+					stopAP = 1;
+					do_sparks = 1;
+				}
+				// If legdmg with slippers -JukS-
+				else
+				{
+					damage_type = LOC_LDAM;
+					damage = damage * .25;
+					if (attacker->client)
+					{
+						strcpy(attacker->client->last_damaged_players, client->pers.netname);
+						Stats_AddHit(attacker, mod, LOC_LDAM);
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n",
+							client->pers.netname);
+					}
 
-				gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
-				targ->client->leg_damage = 1;
-				targ->client->leghits++;
+					gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
+					targ->client->leg_damage = 1;
+					targ->client->leghits++;
+				}
 			}
 			else if (z_rel < STOMACH_DAMAGE)
 			{

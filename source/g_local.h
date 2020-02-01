@@ -555,7 +555,7 @@ bind 6 "use Sniper Rifle"
 #define GRENADE_NAME "M26 Fragmentation Grenade"
 
 #define SIL_NAME     "Silencer"
-#define SLIP_NAME    "Stealth Slippers"
+#define SLIP_NAME    "Stealth Slippers & Greaves" // Greaves added by JukS (1.2.2020)
 #define BAND_NAME    "Bandolier"
 #define KEV_NAME     "Kevlar Vest"
 #define HELM_NAME    "Kevlar Helmet"
@@ -906,6 +906,7 @@ extern int sm_meat_index;
 #define LOC_KVLR_VEST	6	// kevlar vest 		Freud, for %D
 #define LOC_NO			7	// Shot by shotgun or handcannon
 #define LOC_MAX			8
+#define LOC_KVLR_LEGS	9	// kevlar greaves	Freud, for %D - Added by JukS (1.2.2020)
 
 extern int meansOfDeath;
 // zucc for hitlocation of death
@@ -1960,7 +1961,7 @@ void AddSplat (edict_t * self, vec3_t point, trace_t * tr);
 #define SNIPER_AMMO_NAME  "AP Sniper Ammo"
 
 #define SIL_NAME     "Silencer"
-#define SLIP_NAME    "Stealth Slippers"
+#define SLIP_NAME    "Stealth Slippers & Greaves" // Greaves added by JukS (1.2.2020)
 #define BAND_NAME    "Bandolier"
 #define KEV_NAME     "Kevlar Vest"
 #define HELM_NAME    "Kevlar Helmet"

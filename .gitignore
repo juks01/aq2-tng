@@ -22,3 +22,5 @@
 .#*
 .DS_Store
 ._*
+/source/.vs/game/v16
+/source/game.vcxproj*

@@ -288,6 +288,9 @@ void Cmd_Stats_f (edict_t *targetent, char *arg)
 		case LOC_KVLR_VEST:
 			string = "Kevlar Vest";
 			break;
+		case LOC_KVLR_LEGS:
+			string = "Kevlar Greaves";
+			break;
 		case LOC_NO:
 			string = "Spread (Shotgun/Handcannon)";
 			break;
