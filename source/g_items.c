@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: g_items.c,v $
+// Revision 1.14  2020/02/15 13:13:00  JukS
+// -Greaves and MK23MIL (aka USSOCOM) added
+// -added stuff commented with "JukS"
+//
 // Revision 1.13  2002/12/31 17:07:22  igor_rock
 // - corrected the Add_Ammo function to regard wp_flags
 //
@@ -69,7 +73,7 @@
 #include "g_local.h"
 
 
-qboolean Pickup_Weapon (edict_t * ent, edict_t * other);
+qboolean Pickup_Weapon(edict_t * ent, edict_t * other);
 void Use_Weapon (edict_t * ent, gitem_t * inv);
 void Drop_Weapon (edict_t * ent, gitem_t * inv);
 
@@ -83,6 +87,7 @@ void Weapon_Sniper (edict_t * ent);
 void Weapon_Dual (edict_t * ent);
 void Weapon_Knife (edict_t * ent);
 void Weapon_Gas (edict_t * ent);
+void Weapon_MK23MIL(edict_t* ent); // Added by JukS (2.2.2020)
 
 #define HEALTH_IGNORE_MAX       1
 #define HEALTH_TIMED            2
@@ -327,6 +332,7 @@ qboolean Pickup_Special (edict_t * ent, edict_t * other)
 
 	AddItem(other, ent->item);
 
+
 	if(!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) && item_respawnmode->value)
 		SetRespawn (ent, item_respawn->value);
 
@@ -419,7 +425,9 @@ void DropSpecialItem (edict_t * ent)
 	if (INV_AMMO(ent, LASER_NUM))
 		Drop_Special (ent, GET_ITEM(LASER_NUM));
 	else if (INV_AMMO(ent, SLIP_NUM))
-		Drop_Special (ent, GET_ITEM(SLIP_NUM));
+		Drop_Special(ent, GET_ITEM(SLIP_NUM));
+	else if (INV_AMMO(ent, GREAVES_NUM))
+		Drop_Special(ent, GET_ITEM(GREAVES_NUM));
 	else if (INV_AMMO(ent, SIL_NUM))
 		Drop_Special (ent, GET_ITEM(SIL_NUM));
 	else if (INV_AMMO(ent, BAND_NUM))
@@ -1228,8 +1236,8 @@ void SpawnItem (edict_t * ent, gitem_t * item)
 	// zucc remove health from the game
 	if (1 /*DMFLAGS(DF_NO_HEALTH) */ )
 	{
-		if (item->pickup == Pickup_Health
-		|| item->pickup == Pickup_Adrenaline
+		if (  // item->pickup == Pickup_Health // Let's see if we enable some health... -JukS-
+		   item->pickup == Pickup_Adrenaline
 		|| item->pickup == Pickup_AncientHead)
 		{
 			G_FreeEdict (ent);
@@ -1324,6 +1332,29 @@ world_model_flags int               copied to 'ent->s.effects' (see s.effects fo
    0,
    "weapons/mk23fire.wav weapons/mk23in.wav weapons/mk23out.wav weapons/mk23slap.wav weapons/mk23slide.wav misc/click.wav weapons/machgf4b.wav weapons/blastf1a.wav",
   MK23_NUM}
+  ,
+
+  {					// Added by JukS
+   "weapon_Mk23MIL",
+   Pickup_Weapon,
+   Use_Weapon,
+   Drop_Weapon,
+   Weapon_MK23MIL,
+   //"misc/w_pkup.wav",
+   NULL,
+   "models/weapons/g_mk23mil/tris.md2", // TODO: model for MK23MIL (v_wep)
+   0,
+   "models/weapons/v_mk23mil/tris.md2", // TOOD: model for MK23MIL (hand)
+   "w_mk23mil",						// TODO?
+   MK23MIL_NAME,
+   0,
+   1,
+   MK23_AMMO_NAME,
+   IT_WEAPON,
+   NULL,
+   0,
+   "weapons/mk23fire.wav weapons/mk23in.wav weapons/mk23out.wav weapons/mk23slap.wav weapons/mk23slide.wav misc/click.wav weapons/machgf4b.wav weapons/blastf1a.wav",
+  MK23MIL_NUM}
   ,
 
 
@@ -1687,18 +1718,41 @@ always owned, never in the world^M
    "models/items/slippers/slippers.md2",
    0,
    NULL,
-/* icon */ "slippers",
-/* pickup */ SLIP_NAME,
-/* width */ 2,
-   60,
+   /* icon */ "slippers",
+   /* pickup */ SLIP_NAME,
+   /* width */ 2,
+	  60,
+	  NULL,
+	  IT_ITEM,
+	  NULL,
+	  0,
+	  /* precache */ "",
+	  SLIP_NUM
+  }
+	  ,
+
+  { // Added by JukS
+   "item_greaves",
+   Pickup_Special,
    NULL,
-   IT_ITEM,
+   Drop_Special,
    NULL,
+   "misc/veston.wav",		// sound		// TODO: Armor sound
+   "models/items/slippers/slippers.md2", // TODO: Greaves model
    0,
-   /* precache */ "",
-   SLIP_NUM
-   }
-  ,
+   NULL,
+   /* icon */ "slippers", // TODO: Greaves icon
+   /* pickup */ GREAVES_NAME,
+   /* width */ 2,
+	  60,
+	  NULL,
+	  IT_ITEM,
+	  NULL,
+	  0,
+	  /* precache */ "",
+	  GREAVES_NUM
+  }
+	  ,
 
   {
    "item_band",
@@ -2175,7 +2229,7 @@ void InitItems (void)
 		items[ITEM_FIRST + i].flag = 1 << i;
 
 	}
-	items[MK23_ANUM].flag = items[MK23_NUM].flag | items[DUAL_NUM].flag;
+	items[MK23_ANUM].flag = items[MK23_NUM].flag | items[DUAL_NUM].flag | items[MK23MIL_NUM].flag; // Added MK23MIL by JukS
 	items[MP5_ANUM].flag = items[MP5_NUM].flag;
 	items[M4_ANUM].flag = items[M4_NUM].flag;
 	items[SHELL_ANUM].flag = items[M3_NUM].flag | items[HC_NUM].flag;

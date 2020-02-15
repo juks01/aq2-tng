@@ -555,6 +555,7 @@ static void Cmd_Give_f (edict_t * ent)
 		ent->client->shot_rds = ent->client->shot_max;
 		ent->client->sniper_rds = ent->client->sniper_max;
 		ent->client->cannon_rds = ent->client->cannon_max;
+		ent->client->mk23mil_rds = ent->client->mk23mil_max; // Added by JukS 12.2.2020
 
 		for (i = 0; i < game.num_items; i++)
 		{

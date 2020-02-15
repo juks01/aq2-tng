@@ -5,6 +5,11 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: g_combat.c,v $
+// Revision 1.28  2020/02/15 13:13:00  JukS
+// -Added Greaves and MK23MIL (aka USSOCOM)
+// -Added distance damage decreasement with MP5, M4, SSG, MK23MIL
+// -Modifications commented with "JukS"
+//
 // Revision 1.27  2002/09/04 11:23:09  ra
 // Added zcam to TNG and bumped version to 3.0
 //
@@ -313,6 +318,9 @@ void spray_blood(edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 	case MOD_SNIPER:
 		speed = 4000;
 		break;
+	case MOD_MK23MIL: // Added by JukS 11.2.2020
+		speed = 2200;
+		break;
 	default:
 		speed = 1800;
 		break;
@@ -485,6 +493,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		switch (mod) {
 		case MOD_MK23:
 		case MOD_DUAL:
+		case MOD_MK23MIL: // Added by JukS
 			// damage reduction for longer range pistol shots
 			dist = Distance( targ->s.origin, inflictor->s.origin );
 			if (dist > 1400.0)
@@ -493,8 +502,29 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				damage = (int)(damage * 2 / 3);
 			//Fallthrough
 		case MOD_MP5:
+			// damage reduction for longer range MP5 shots	-- Copied by JukS
+			dist = Distance(targ->s.origin, inflictor->s.origin);
+			if (dist > 1400.0)
+				damage = (int)(damage * 1 / 2);
+			else if (dist > 600.0)
+				damage = (int)(damage * 2 / 3);
+			//Fallthrough
 		case MOD_M4:
+			// damage reduction for longer range M4 shots	-- Copied by JukS
+			dist = Distance(targ->s.origin, inflictor->s.origin);
+			if (dist > 1400.0)
+				damage = (int)(damage * 1 / 2);
+			else if (dist > 600.0)
+				damage = (int)(damage * 2 / 3);
+			//Fallthrough
 		case MOD_SNIPER:
+			// damage reduction for longer range SNIPER shots	-- Copied by JukS
+			dist = Distance(targ->s.origin, inflictor->s.origin);
+			if (dist > 2000.0)
+				damage = (int)(damage * 1 / 2);
+			else if (dist > 1000.0)
+				damage = (int)(damage * 2 / 3);
+			//Fallthrough
 		case MOD_KNIFE:
 		case MOD_KNIFE_THROWN:
 
@@ -594,12 +624,12 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			else if (z_rel < LEG_DAMAGE)
 			{
 				// If legdmg with slippers -JukS-
-				if (INV_AMMO(targ, SLIP_NUM) && mod != MOD_KNIFE
-					&& mod != MOD_KNIFE_THROWN && mod != MOD_SNIPER)
+				if ((INV_AMMO(targ, GREAVES_NUM) && mod != MOD_KNIFE
+					&& mod != MOD_KNIFE_THROWN && mod != MOD_SNIPER))
 				{
 					if (attacker->client)
 					{
-						gi.cprintf(attacker, PRINT_HIGH, "%s has a Greaves - AIM HIGHER!\n",
+						gi.cprintf(attacker, PRINT_HIGH, "%s has Greaves - AIM HIGHER!\n",
 							targ->client->pers.netname);
 						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed most of %s's shot\n",
 							attacker->client->pers.netname);
@@ -607,13 +637,13 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					gi.sound(targ, CHAN_ITEM, gi.soundindex("misc/vest.wav"), 1,
 						ATTN_NORM, 0);
 					damage = (int)(damage / 10);
-					damage_type = LOC_KVLR_LEGS;
+					damage_type = LOC_GREAVES;
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;
 					do_sparks = 1;
 				}
-				else if (INV_AMMO(targ, SLIP_NUM) && mod == MOD_SNIPER)
+				else if ((INV_AMMO(targ, GREAVES_NUM) && mod == MOD_SNIPER))
 				{
 					if (attacker->client)
 					{
@@ -623,13 +653,13 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 							attacker->client->pers.netname);
 					}
 					damage = damage * .225;
-					damage_type = LOC_KVLR_LEGS;
+					damage_type = LOC_GREAVES;
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;
 					do_sparks = 1;
 				}
-				// If legdmg with slippers -JukS-
+				// end of If legdmg with slippers -JukS- (1.2.2020)
 				else
 				{
 					damage_type = LOC_LDAM;
@@ -696,7 +726,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						gi.cprintf (targ, PRINT_HIGH, "Kevlar Vest absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = damage * .325;
+					damage = damage * .4; // Increased (.325 -> .4) by JukS
 				}
 				else
 				{
@@ -708,7 +738,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 							attacker->client->pers.netname);
 					}
 					gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
-					damage = (int)(damage / 10);
+					damage = (int)(damage / 12); // Increased (/10 -> /12) by JukS
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;

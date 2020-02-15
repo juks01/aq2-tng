@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: g_spawn.c,v $
+// Revision 1.39  2020/02/15 13:13:00  JukS
+// -Greaves and MK23MIL (aka USSOCOM) added
+// -added stuff commented with "JukS"
+//
 // Revision 1.38  2002/03/28 12:10:11  freud
 // Removed unused variables (compiler warnings).
 // Added cvar mm_allowlock.
@@ -1008,9 +1012,11 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	}
 	else if (teamplay->value)
 	{
+		// gi.dprintf("Teamplay Enabled\n"); // JukS
 		gameSettings |= (GS_ROUNDBASED | GS_WEAPONCHOOSE);
 	}
 	else { //Its deathmatch
+		// gi.dprintf("Deathmatch Enabled\n"); // JukS
 		gameSettings |= GS_DEATHMATCH;
 		if (dm_choose->value)
 			gameSettings |= GS_WEAPONCHOOSE;
@@ -1029,6 +1035,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			gi.cvar_forceset(use_oldspawns->name, "1");
 		}
 	}
+
+
 
 
 	gi.cvar_forceset(maptime->name, "0:00");
@@ -1472,6 +1480,7 @@ void SP_worldspawn (edict_t * ent)
 	level.pic_weapon_ammo[HC_NUM] = shells;
 	level.pic_weapon_ammo[SNIPER_NUM] = bullets;
 	level.pic_weapon_ammo[DUAL_NUM] = bullets;
+	level.pic_weapon_ammo[MK23MIL_NUM] = bullets; // Added by JukS
 	level.pic_weapon_ammo[KNIFE_NUM] = gi.imageindex("w_knife");
 	level.pic_weapon_ammo[GRENADE_NUM] = gi.imageindex("a_m61frag");
 
@@ -1595,6 +1604,7 @@ void SP_worldspawn (edict_t * ent)
 	gi.modelindex("#w_sniper.md2");
 	gi.modelindex("#w_akimbo.md2");
 	gi.modelindex("#w_knife.md2");
+	gi.modelindex("#w_mk23.md2"); // Added by JukS - TODO (change to mk23mil model and check if vwep working)
 	gi.modelindex("#a_m61frag.md2");
 
 	level.model_null = gi.modelindex("sprites/null.sp2");      // null sprite

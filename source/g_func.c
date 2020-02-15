@@ -107,10 +107,12 @@ static void DestroyItem( edict_t *ent, qboolean by_door )
 			case M3_NUM:
 			case HC_NUM:
 			case SNIPER_NUM:
+			case MK23MIL_NUM:	// Added by JukS 11.2.2020
 				ThinkSpecWeap( ent );
 				break;
 			case SIL_NUM:
 			case SLIP_NUM:
+			case GREAVES_NUM:	// Added by JukS 11.2.2020
 			case BAND_NUM:
 			case KEV_NUM:
 			case HELM_NUM:

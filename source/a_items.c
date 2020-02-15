@@ -115,7 +115,7 @@ void SpawnSpecs(edict_t * ent)
 			continue;
 
 		if ((spec = GET_ITEM(itemNum)) != NULL && (spot = FindSpecSpawn()) != NULL) {
-			//gi.dprintf("Spawning special item '%s'.\n", tnames[i]);
+			// gi.dprintf("Spawning special item '%s'.\n", GET_ITEM(itemNum)->pickup_name); // Modified by JukS
 			SpawnSpec(spec, spot);
 		}
 	}

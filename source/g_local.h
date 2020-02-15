@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: g_local.h,v $
+// Revision 1.69  2020/02/15 13:13:00  JukS
+// -Greaves and MK23MIL (aka USSOCOM) added
+// -added stuff commented with "JukS"
+//
 // Revision 1.68  2004/04/08 23:19:51  slicerdw
 // Optimized some code, added a couple of features and fixed minor bugs
 //
@@ -553,13 +557,15 @@ bind 6 "use Sniper Rifle"
 #define DUAL_NAME    "Dual MK23 Pistols"
 #define KNIFE_NAME   "Combat Knife"
 #define GRENADE_NAME "M26 Fragmentation Grenade"
+#define MK23MIL_NAME "USSOCOM MK23 Pistol" // added by JukS (2.2.2020)
 
 #define SIL_NAME     "Silencer"
-#define SLIP_NAME    "Stealth Slippers & Greaves" // Greaves added by JukS (1.2.2020)
+#define SLIP_NAME    "Stealth Slippers"
 #define BAND_NAME    "Bandolier"
 #define KEV_NAME     "Kevlar Vest"
 #define HELM_NAME    "Kevlar Helmet"
 #define LASER_NAME   "Lasersight"
+#define GREAVES_NAME "Stealth Slippers & Greaves" // Greaves added by JukS (1.2.2020)
 
 #define NO_NUM					0
 
@@ -571,30 +577,32 @@ bind 6 "use Sniper Rifle"
 #define SNIPER_NUM				6
 #define DUAL_NUM				7
 #define KNIFE_NUM				8
-#define GRENADE_NUM				9
+#define MK23MIL_NUM				9 // added by JukS (2.2.2020)
+#define GRENADE_NUM				10
 
-#define SIL_NUM					10
-#define SLIP_NUM				11
-#define BAND_NUM				12
-#define KEV_NUM					13
-#define LASER_NUM				14
-#define HELM_NUM				15
+#define SIL_NUM					11
+#define SLIP_NUM				12
+#define BAND_NUM				13
+#define KEV_NUM					14
+#define LASER_NUM				15
+#define HELM_NUM				16
+#define GREAVES_NUM				17 // added by JukS (2.2.2020)
 
-#define MK23_ANUM				16
-#define MP5_ANUM				17
-#define M4_ANUM					18
-#define SHELL_ANUM				19
-#define SNIPER_ANUM				20
+#define MK23_ANUM				18
+#define MP5_ANUM				19
+#define M4_ANUM					20
+#define SHELL_ANUM				21
+#define SNIPER_ANUM				22
 
-#define FLAG_T1_NUM				21
-#define FLAG_T2_NUM				22
+#define FLAG_T1_NUM				23
+#define FLAG_T2_NUM				24
 
-#define GRAPPLE_NUM				23
+#define GRAPPLE_NUM				25
 
-#define ITEM_MAX_NUM			24
+#define ITEM_MAX_NUM			25
 
-#define WEAPON_COUNT			9
-#define ITEM_COUNT				6
+#define WEAPON_COUNT			10
+#define ITEM_COUNT				7
 #define AMMO_COUNT				5
 #define WEAPON_FIRST			1
 #define WEAPON_MAX				WEAPON_FIRST+WEAPON_COUNT
@@ -608,12 +616,12 @@ bind 6 "use Sniper Rifle"
 #define TOSTRING(x) STRINGIFY(x)
 
 #define WPF_MASK				((1 << WEAPON_COUNT) - 1)
-#define WPF_DEFAULT				511 //WPF_MASK
+#define WPF_DEFAULT				1023 //WPF_MASK
 #define WPF_DEFAULT_STR			TOSTRING(WPF_DEFAULT)
 #define WPF_ALLOWED(typeNum)	((int)wp_flags->value & items[typeNum].flag)
 
 #define ITF_MASK				((1 << ITEM_COUNT) - 1)
-#define ITF_DEFAULT				63 //ITF_MASK
+#define ITF_DEFAULT				127 //ITF_MASK
 #define ITF_DEFAULT_STR			TOSTRING(ITF_DEFAULT)
 #define ITF_ALLOWED(typeNum)	((int)itm_flags->value & items[typeNum].flag)
 //AQ2:TNG End adding flags
@@ -866,36 +874,38 @@ extern int sm_meat_index;
 #define MOD_DUAL                        7
 #define MOD_KNIFE                       8
 #define MOD_KNIFE_THROWN                9
-#define MOD_GRENADE                     10
-#define MOD_G_SPLASH                    11
-#define MOD_HANDGRENADE                 12
-#define MOD_HG_SPLASH                   13
-#define MOD_PUNCH                       14
-#define MOD_BLASTER                     15
-#define MOD_HYPERBLASTER                16
-#define MOD_WATER                       17
-#define MOD_SLIME                       18
-#define MOD_LAVA                        19
-#define MOD_CRUSH                       20
-#define MOD_TELEFRAG                    21
-#define MOD_FALLING                     22
-#define MOD_SUICIDE                     23
-#define MOD_HELD_GRENADE                24
-#define MOD_EXPLOSIVE                   25
-#define MOD_BARREL                      26
-#define MOD_BOMB                        27
-#define MOD_EXIT                        28
-#define MOD_SPLASH                      29
-#define MOD_TARGET_LASER                30
-#define MOD_TRIGGER_HURT                31
-#define MOD_HIT                         32
-#define MOD_TARGET_BLASTER              33
+#define MOD_MK23MIL                     10 // Added by JukS (15.2.2020)
+#define MOD_GRENADE                     11
+#define MOD_G_SPLASH                    12
+#define MOD_HANDGRENADE                 13
+#define MOD_HG_SPLASH                   14
+#define MOD_PUNCH                       15
+#define MOD_BLASTER                     16
+#define MOD_HYPERBLASTER                17
+#define MOD_WATER                       18
+#define MOD_SLIME                       19
+#define MOD_LAVA                        20
+#define MOD_CRUSH                       21
+#define MOD_TELEFRAG                    22
+#define MOD_FALLING                     23
+#define MOD_SUICIDE                     24
+#define MOD_HELD_GRENADE                25
+#define MOD_EXPLOSIVE                   26
+#define MOD_BARREL                      27
+#define MOD_BOMB                        28
+#define MOD_EXIT                        29
+#define MOD_SPLASH                      30
+#define MOD_TARGET_LASER                31
+#define MOD_TRIGGER_HURT                32
+#define MOD_HIT                         33
+#define MOD_TARGET_BLASTER              34
 //zucc
-#define MOD_BLEEDING                    34
-#define MOD_KICK                        35
-#define MOD_GRAPPLE						36
-#define MOD_TOTAL						37
+#define MOD_BLEEDING                    35
+#define MOD_KICK                        36
+#define MOD_GRAPPLE						37
+#define MOD_TOTAL						38
 #define MOD_FRIENDLY_FIRE               0x8000000
+
 
 // types of locations that can be hit
 #define LOC_HDAM		1	// head
@@ -905,8 +915,8 @@ extern int sm_meat_index;
 #define LOC_KVLR_HELMET 5	// kevlar helmet	Freud, for %D
 #define LOC_KVLR_VEST	6	// kevlar vest 		Freud, for %D
 #define LOC_NO			7	// Shot by shotgun or handcannon
-#define LOC_MAX			8
-#define LOC_KVLR_LEGS	9	// kevlar greaves	Freud, for %D - Added by JukS (1.2.2020)
+#define LOC_GREAVES		9	// kevlar greaves	Added by JukS (1.2.2020)
+#define LOC_MAX			9
 
 extern int meansOfDeath;
 // zucc for hitlocation of death
@@ -932,6 +942,7 @@ extern cvar_t *dmflags;
 extern cvar_t *needpass;
 extern cvar_t *hostname;
 extern cvar_t *teamplay;
+extern cvar_t *greaves; // Added by JukS (1.2.2020)
 extern cvar_t *radiolog;
 extern cvar_t *motd_time;
 extern cvar_t *actionmaps;
@@ -1422,6 +1433,7 @@ typedef struct
 	int knife_mode;
 	int grenade_mode;
 	int hc_mode;
+	int mk23mil_mode;		// firing mode, semi or auto - Added by JukS
 	int id;			// id command on or off
 	int irvision;			// ir on or off (only matters if player has ir device, currently bandolier)
 
@@ -1605,6 +1617,8 @@ struct gclient_s
 
 	int			mk23_max;
 	int			mk23_rds;
+	int			mk23mil_max; // Added by JukS 12.2.2020
+	int			mk23mil_rds; // Added by JukS 12.2.2020
 
 	int			dual_max;
 	int			dual_rds;

@@ -367,12 +367,12 @@ void G_SetStats (edict_t * ent)
 		// zucc display special item and special weapon
 		// Raptor007: Modified to rotate through all carried special weapons and items.
 
-		int icons[ 6 ], icon_count, i;
+		int icons[ 7 ], icon_count, i; // Modified by JukS 14.2.2020
 		int cycle = hud_items_cycle->value * FRAMEDIV;
 
 		icon_count = 0;
-		int weapon_ids[ 6 ] = { SNIPER_NUM, M4_NUM, MP5_NUM, M3_NUM, HC_NUM, DUAL_NUM };
-		for( i = 0; i < 6; i ++ )
+		int weapon_ids[ 7 ] = { SNIPER_NUM, M4_NUM, MP5_NUM, M3_NUM, HC_NUM, DUAL_NUM, MK23MIL_NUM }; // Added MK23MIL -JukS-
+		for( i = 0; i < 7; i ++ )
 		{
 			if( INV_AMMO( ent, weapon_ids[i] ) )
 				icons[ icon_count ++ ] = level.pic_items[ weapon_ids[i] ];
@@ -385,8 +385,8 @@ void G_SetStats (edict_t * ent)
 			ent->client->ps.stats[STAT_WEAPONS_ICON] = 0;
 
 		icon_count = 0;
-		int s_item_ids[ 6 ] = { KEV_NUM, HELM_NUM, BAND_NUM, SIL_NUM, SLIP_NUM, LASER_NUM };
-		for( i = 0; i < 6; i ++ )
+		int s_item_ids[ 7 ] = { KEV_NUM, HELM_NUM, BAND_NUM, SIL_NUM, SLIP_NUM, LASER_NUM, GREAVES_NUM }; // Modified by JukS 11.2.2020
+		for( i = 0; i < 7; i ++ )
 		{
 			if( INV_AMMO( ent, s_item_ids[i] ) )
 				icons[ icon_count ++ ] = level.pic_items[ s_item_ids[i]];
@@ -452,6 +452,10 @@ void G_SetStats (edict_t * ent)
 			case GRENADE_NUM:
 				ent->client->ps.stats[STAT_AMMO_ICON] = level.pic_weapon_ammo[ent->client->curr_weap];
 				ent->client->ps.stats[STAT_AMMO] = INV_AMMO(ent, GRENADE_NUM);
+				break;
+			case MK23MIL_NUM: // Added by JukS 11.2.2020 (ammo by weap)
+				ent->client->ps.stats[STAT_AMMO_ICON] = level.pic_weapon_ammo[ent->client->curr_weap];
+				ent->client->ps.stats[STAT_AMMO] = ent->client->mk23mil_rds;
 				break;
 			case GRAPPLE_NUM:
 				ent->client->ps.stats[STAT_AMMO_ICON] = 0;

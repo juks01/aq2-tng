@@ -1300,8 +1300,10 @@ void CTFCapReward(edict_t * ent)
 			player_weapon = M3_NUM;
 		if(ent->client->inventory[ITEM_INDEX(GET_ITEM(HC_NUM))])
 			player_weapon = HC_NUM;
-		if(ent->client->inventory[ITEM_INDEX(GET_ITEM(SNIPER_NUM))])
+		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(SNIPER_NUM))])
 			player_weapon = SNIPER_NUM;
+		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(MK23MIL_NUM))])
+			player_weapon = MK23MIL_NUM;
 	}
 
 
@@ -1315,7 +1317,8 @@ void CTFCapReward(edict_t * ent)
 		item = GET_ITEM(MP5_ANUM);
 		client->inventory[ITEM_INDEX(item)] = 1*band;
 		client->mp5_rds = client->mp5_max;
-	} else if (player_weapon == M4_NUM) {
+	}
+	else if (player_weapon == M4_NUM) {
 		if(client->unique_weapon_total < 1) {
 			item = GET_ITEM(M4_NUM);
 			client->inventory[ITEM_INDEX(item)] = 1;
@@ -1324,7 +1327,8 @@ void CTFCapReward(edict_t * ent)
 		item = GET_ITEM(M4_ANUM);
 		client->inventory[ITEM_INDEX(item)] = 1*band;
 		client->m4_rds = client->m4_max;
-	} else if (player_weapon == M3_NUM) {
+	}
+	else if (player_weapon == M3_NUM) {
 		if(client->unique_weapon_total < 1) {
 			item = GET_ITEM(M3_NUM);
 			client->inventory[ITEM_INDEX(item)] = 1;
@@ -1342,7 +1346,8 @@ void CTFCapReward(edict_t * ent)
 		item = GET_ITEM(SHELL_ANUM);
 		client->inventory[ITEM_INDEX(item)] = 12*band;
 		client->cannon_rds = client->cannon_max;
-	} else if (player_weapon == SNIPER_NUM) {
+	}
+	else if (player_weapon == SNIPER_NUM) {
 		if(client->unique_weapon_total < 1) {
 			item = GET_ITEM(SNIPER_NUM);
 			client->inventory[ITEM_INDEX(item)] = 1;
@@ -1351,14 +1356,24 @@ void CTFCapReward(edict_t * ent)
 		item = GET_ITEM(SNIPER_ANUM);
 		client->inventory[ITEM_INDEX(item)] = 10*band;
 		client->sniper_rds = client->sniper_max;
-	} else if (player_weapon == DUAL_NUM) {
+	}
+	else if (player_weapon == DUAL_NUM) {
 		item = GET_ITEM(DUAL_NUM);
 		client->inventory[ITEM_INDEX(item)] = 1;
 
 		item = GET_ITEM(MK23_ANUM);
-		client->inventory[ITEM_INDEX(item)] = 2*band;
+		client->inventory[ITEM_INDEX(item)] = 2 * band;
 		client->dual_rds = client->dual_max;
-	} else if (player_weapon == KNIFE_NUM) {
+	}
+	else if (player_weapon == MK23MIL_NUM) { // Added by JukS 12.2.2020
+		item = GET_ITEM(MK23MIL_NUM);
+		client->inventory[ITEM_INDEX(item)] = 1;
+
+		item = GET_ITEM(MK23_ANUM);
+		client->inventory[ITEM_INDEX(item)] = 2 * band;
+		client->dual_rds = client->dual_max;
+	}
+	else if (player_weapon == KNIFE_NUM) {
 		item = GET_ITEM(KNIFE_NUM);
 		client->inventory[ITEM_INDEX(item)] = 10*band;
 	}

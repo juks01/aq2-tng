@@ -538,6 +538,8 @@ void InitGame( void )
 
 	use_mvd2 = gi.cvar( "use_mvd2", "0", 0 );	// JBravo: q2pro MVD2 recording. 0 = off, 1 = on
 
+	greaves = gi.cvar("greaves", "0", 0); // Greaves toggle -JukS- (1.2.2020)
+
 	// items
 	InitItems();
 

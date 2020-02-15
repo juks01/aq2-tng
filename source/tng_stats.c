@@ -223,6 +223,9 @@ void Cmd_Stats_f (edict_t *targetent, char *arg)
 		case MOD_MK23:
 			string = "Pistol";
 			break;
+		case MOD_MK23MIL: // Added by JukS
+			string = MK23MIL_NAME;
+			break;
 		case MOD_DUAL:
 			string = "Dual Pistols";
 			break;
@@ -288,7 +291,7 @@ void Cmd_Stats_f (edict_t *targetent, char *arg)
 		case LOC_KVLR_VEST:
 			string = "Kevlar Vest";
 			break;
-		case LOC_KVLR_LEGS:
+		case LOC_GREAVES:
 			string = "Kevlar Greaves";
 			break;
 		case LOC_NO:

@@ -149,15 +149,17 @@ void SP_LaserSight(edict_t * self, gitem_t * item)
 			G_FreeEdict(lasersight);
 			self->client->lasersight = NULL;
 		}
-		return;
+		if (!self->client->curr_weap == MK23MIL_NUM) { return; } // Keep laser on if MK23MIL -JukS-
 	}
+	
 	//zucc code to make it be used with the right weapons
-
 	switch (self->client->weapon->typeNum) {
 	case MK23_NUM:
 	case MP5_NUM:
 	case M4_NUM:
+	case MK23MIL_NUM: // Added by JukS 11.2.2020
 		break;
+
 	default:
 		// laser is on but we want it off
 		if (lasersight) {
@@ -170,6 +172,7 @@ void SP_LaserSight(edict_t * self, gitem_t * item)
 	if (lasersight) { //Lasersight is already on
 		return;
 	}
+	else if (!lasersight && self->client->curr_weap == MK23MIL_NUM) {  }
 
 	lasersight = G_Spawn();
 	self->client->lasersight = lasersight;
@@ -372,7 +375,15 @@ void Cmd_Reload_f(edict_t * ent)
 	case MK23_NUM:
 		if (ent->client->mk23_rds == ent->client->mk23_max)
 			return;
-		if(ent->client->inventory[ent->client->ammo_index] <= 0) {
+		if (ent->client->inventory[ent->client->ammo_index] <= 0) {
+			gi.cprintf(ent, PRINT_HIGH, "Out of ammo\n");
+			return;
+		}
+		break;
+	case MK23MIL_NUM: // Added by JukS (reload)
+		if (ent->client->mk23mil_rds == ent->client->mk23mil_max)
+			return;
+		if (ent->client->inventory[ent->client->ammo_index] <= 0) {
 			gi.cprintf(ent, PRINT_HIGH, "Out of ammo\n");
 			return;
 		}
@@ -381,6 +392,7 @@ void Cmd_Reload_f(edict_t * ent)
 	//We should never get here, but...
 	//BD 5/26 - Actually we get here quite often right now. Just exit for weaps that we
 	//          don't want reloaded or that never reload (grenades)
+		// Maybe we could repin grenade by this?
 		return;
 	}
 
@@ -676,6 +688,16 @@ void Cmd_Weapon_f(edict_t * ent)
 			ent->client->pers.grenade_mode = 0;
 		}
 		break;
+	case MK23MIL_NUM: // Added by JukS 11.2.2020 (mode select)
+		if (!dead)
+			gi.sound(ent, CHAN_ITEM, gi.soundindex("misc/click.wav"), 1, ATTN_NORM, 0);
+		ent->client->pers.mk23mil_mode = !(ent->client->pers.mk23mil_mode);
+		if (ent->client->pers.mk23mil_mode)
+			gi.cprintf(ent, PRINT_HIGH, "USSOCOM MK23 Pistol set for semi-automatic action\n");
+		else
+			gi.cprintf(ent, PRINT_HIGH, "USSOCOM MK23 Pistol set for automatic action\n");
+		break;
+
 	}
 }
 
@@ -897,6 +919,8 @@ int GetWeaponNumFromArg(const char *s)
 		itemNum = SNIPER_NUM;
 	else if (!Q_stricmp(s, "m4"))
 		itemNum = M4_NUM;
+	else if (!Q_stricmp(s, "socom")) // Added by JukS 11.2.2020
+		itemNum = MK23MIL_NUM;
 
 	return itemNum;
 }
@@ -925,6 +949,8 @@ int GetItemNumFromArg(const char *s)
 		itemNum = SLIP_NUM;
 	else if (!Q_stricmp(s, "helmet"))
 		itemNum = HELM_NUM;
+	else if (!Q_stricmp(s, "greaves")) // Added by JukS 11.2.2020
+		itemNum = GREAVES_NUM;
 
 	return itemNum;
 }
@@ -955,6 +981,7 @@ void Cmd_Choose_f(edict_t * ent)
 	case SNIPER_NUM:
 	case KNIFE_NUM:
 	case M4_NUM:
+	case MK23MIL_NUM: // Added by JukS 11.2.2020
 		if (!WPF_ALLOWED(itemNum)) {
 			gi.cprintf(ent, PRINT_HIGH, "Weapon disabled on this server.\n");
 			return;
@@ -964,6 +991,7 @@ void Cmd_Choose_f(edict_t * ent)
 	case LASER_NUM:
 	case KEV_NUM:
 	case SLIP_NUM:
+	case GREAVES_NUM: // Added by JukS 11.2.2020
 	case SIL_NUM:
 	case HELM_NUM:
 	case BAND_NUM:
@@ -984,7 +1012,7 @@ void Cmd_Choose_f(edict_t * ent)
 	item = ent->client->pers.chosenItem;
 	itmText = (item && item->pickup_name) ? item->pickup_name : "NONE";
 
-	gi.cprintf(ent, PRINT_HIGH, "Weapon selected: %s\nItem selected: %s\n", wpnText, itmText );
+	gi.cprintf(ent, PRINT_HIGH, "Weapon selected: %s\nItem selected: %s\n", wpnText, itmText);
 }
 
 // AQ:TNG - JBravo adding tkok

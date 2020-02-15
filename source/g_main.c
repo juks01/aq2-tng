@@ -287,6 +287,7 @@ edict_t *g_edicts;
 //FIREBLADE
 cvar_t *hostname;
 cvar_t *teamplay;
+cvar_t *greaves; // Toggle for Greaves - Added by JukS (1.2.2020)
 cvar_t *radiolog;
 cvar_t *motd_time;
 cvar_t *actionmaps;

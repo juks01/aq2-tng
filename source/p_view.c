@@ -666,7 +666,7 @@ void P_FallingDamage (edict_t * ent)
 			return;
 
 		// zucc look for slippers to avoid noise
-		if(!INV_AMMO(ent, SLIP_NUM))
+		if(!INV_AMMO(ent, SLIP_NUM) && !INV_AMMO(ent, GREAVES_NUM)) // Modified by JukS 11.2.2020
 			ent->s.event = EV_FOOTSTEP;
 
 		return;
@@ -680,7 +680,7 @@ void P_FallingDamage (edict_t * ent)
 	if (delta <= 30)
 	{
 		//zucc added check for slippers, this is just another noise
-		if(!INV_AMMO(ent, SLIP_NUM))
+		if(!INV_AMMO(ent, SLIP_NUM) && !INV_AMMO(ent, GREAVES_NUM)) // Added by JukS 11.2.2020
 			ent->s.event = EV_FALLSHORT;
 
 		return;
@@ -986,8 +986,8 @@ void G_SetClientEvent (edict_t * ent)
 	int footstep_speed = silentwalk->value ? 290 : 225;
 	if (ent->groundentity && (xyspeed > footstep_speed))
 	{
-		//zucc added item check to see if they have slippers
-		if ((int)(current_client->bobtime + bobmove) != bobcycle && !INV_AMMO(ent, SLIP_NUM))
+		//zucc added item check to see if they have slippers -- Added greaves check -JukS-
+		if ((int)(current_client->bobtime + bobmove) != bobcycle && (!INV_AMMO(ent, SLIP_NUM) && !INV_AMMO(ent, GREAVES_NUM)))
 			ent->s.event = EV_FOOTSTEP;
 	}
 }

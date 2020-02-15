@@ -857,6 +857,39 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 				message2 = "'s Mark 23 Pistol";
 			}
 			break;
+		case MOD_MK23MIL:	// Added by JukS
+			switch (loc) {
+			case LOC_HDAM:
+				if (self->client->pers.gender == GENDER_MALE)
+					message = " has a hole in his head from";
+				else if (self->client->pers.gender == GENDER_FEMALE)
+					message = " has a hole in her head from";
+				else
+					message = " has a hole in its head from";
+				message2 = "'s SOCOM MK23 pistol";
+				break;
+			case LOC_CDAM:
+				message = " loses a vital chest organ thanks to";
+				message2 = "'s SOCOM MK23 pistol";
+				break;
+			case LOC_SDAM:
+				if (self->client->pers.gender == GENDER_MALE)
+					message = " loses his lunch to";
+				else if (self->client->pers.gender == GENDER_FEMALE)
+					message = " loses her lunch to";
+				else
+					message = " loses its lunch to";
+				message2 = "'s .45 caliber pistol round";
+				break;
+			case LOC_LDAM:
+				message = " is legless because of";
+				message2 = "'s .45 caliber pistol round";
+				break;
+			default:
+				message = " was shot by";
+				message2 = "'s SOCOM MK23 pistol";
+			}
+			break;
 		case MOD_MP5:
 			switch (loc) {
 			case LOC_HDAM:
@@ -1244,7 +1277,13 @@ void TossItemsOnDeath(edict_t * ent)
 	if (ent->client->inventory[ITEM_INDEX(item)] > 0) {
 		EjectItem(ent, item);
 	}
-// special items
+
+	item = GET_ITEM(MK23MIL_NUM);
+	if (ent->client->inventory[ITEM_INDEX(item)] > 0) {		// Added by JukS (drop also MK23MIL)
+		EjectItem(ent, item);
+	}
+
+	// special items
 
 	if (!DMFLAGS(DF_QUAD_DROP))
 		quad = false;
@@ -2054,6 +2093,20 @@ void EquipClient(edict_t * ent)
 			client->inventory[ITEM_INDEX(item)] = 2;
 		client->dual_rds = client->dual_max;
 		break;
+	case MK23MIL_NUM: // Added by JukS 14.2.2020 (equip client)
+		item = GET_ITEM(MK23MIL_NUM);
+		client->selected_item = ITEM_INDEX(item);
+		client->inventory[client->selected_item] = 1;
+		client->weapon = item;
+		client->curr_weap = MK23MIL_NUM;
+		client->unique_weapon_total = 1;
+		item = GET_ITEM(MK23_ANUM); // Add regular bullets (MK23 clips)
+		if (band)
+			client->inventory[ITEM_INDEX(item)] = 2;
+		else
+			client->inventory[ITEM_INDEX(item)] = 1;
+		client->mk23mil_rds = client->mk23mil_max;
+		break;
 	case KNIFE_NUM:
 		item = GET_ITEM(KNIFE_NUM);
 		client->selected_item = ITEM_INDEX(item);
@@ -2183,6 +2236,21 @@ void EquipClientDM(edict_t * ent)
 		client->weapon = item;
 		client->curr_weap = KNIFE_NUM;
 		break;
+	case MK23MIL_NUM: // Added by JukS 12.2.2020 (equip client DM)
+		item = GET_ITEM(MK23MIL_NUM);
+		client->selected_item = ITEM_INDEX(item);
+		client->inventory[client->selected_item] = 1;
+		client->weapon = item;
+		client->mk23_rds = client->mk23_max;
+		client->mk23mil_rds = client->mk23mil_max;
+		client->dual_rds = client->dual_max;
+		client->curr_weap = MK23MIL_NUM;
+		if (!allweapon->value) {
+			client->unique_weapon_total = 1;
+		}
+		item = GET_ITEM(MK23_ANUM); // Add regular bullets (MK23 clips) -JukS-
+		client->inventory[ITEM_INDEX(item)] = 2;
+		break;
 	}
 }
 
@@ -2251,7 +2319,7 @@ void PutClientInServer(edict_t * ent)
 
 
 	ent->health = 100;
-	ent->max_health = 100;
+	ent->max_health = 120;
 	
 	client->max_pistolmags = 2;
 	client->max_shells = 14;
@@ -2263,15 +2331,17 @@ void PutClientInServer(edict_t * ent)
 	client->grenade_max = 2;
 
 	client->mk23_max = 12;
+	client->mk23mil_max = 12; // Added by JukS
 	client->mp5_max = 30;
 	client->m4_max = 24;
 	client->shot_max = 7;
-	client->sniper_max = 6;
+	client->sniper_max = 5;
 	client->cannon_max = 2;
 	client->dual_max = 24;
 	if (WPF_ALLOWED( MK23_NUM )) {
 		client->mk23_rds = client->mk23_max;
 		client->dual_rds = client->mk23_max;
+		client->mk23mil_rds = client->mk23mil_max; // Added by JukS
 	}
 
 	client->knife_max = 10;

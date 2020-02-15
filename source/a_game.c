@@ -9,6 +9,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: a_game.c,v $
+// Revision 1.15  2020/02/15 13:13:00  JukS
+// -MK23MIL (aka USSOCOM) added
+// -added stuff commented with "JukS"
+//
 // Revision 1.14  2003/06/15 15:34:32  igor
 // - removed the zcam code from this branch (see other branch)
 // - added fixes from 2.72 (source only) version
@@ -715,6 +719,11 @@ void EjectShell(edict_t * self, vec3_t start, int toggle)
 		VectorMA(start, left ? 4 : 4, forward, start);
 		VectorMA(start, left ? -1 : -1, up, start);
 	}
+	else if (self->client->curr_weap == MK23MIL_NUM) { // Added by JukS 11.2.2020
+		VectorMA(start, left ? -7 : .4, right, start);
+		VectorMA(start, left ? 5 : 2, forward, start);
+		VectorMA(start, left ? -10 : -8, up, start);
+	}
 
 	else if (self->client->curr_weap == DUAL_NUM) {
 		if (self->client->pers.hand == LEFT_HANDED)
@@ -1177,8 +1186,14 @@ void GetAmmo( edict_t *ent, char *buf )
 				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
 			return;
 		case DUAL_NUM:
-			sprintf( buf, "%d round%s (%d extra mag%s)",
+			sprintf(buf, "%d round%s (%d extra mag%s)",
 				ent->client->dual_rds, ent->client->dual_rds == 1 ? "" : "s",
+				ent->client->inventory[ent->client->ammo_index],
+				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
+			return;
+		case MK23MIL_NUM: // Added by JukS 11.2.2020
+			sprintf(buf, "%d round%s (%d extra mag%s)",
+				ent->client->mk23mil_rds, ent->client->mk23mil_rds == 1 ? "" : "s",
 				ent->client->inventory[ent->client->ammo_index],
 				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
 			return;

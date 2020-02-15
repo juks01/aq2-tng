@@ -169,7 +169,7 @@ static void GetLastDamagedPart(edict_t *self, char *buf)
 	case LOC_KVLR_VEST:
 		strcpy(buf, "kevlar vest");
 		break;
-	case LOC_KVLR_LEGS:
+	case LOC_GREAVES:
 		strcpy(buf, "kevlar greaves");
 		break;
 	case LOC_NO:

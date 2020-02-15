@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: p_weapon.c,v $
+// Revision 1.21  2020/02/15  13:13:00  JukS
+// -Added MK23MIL (aka USSOCOM)
+// -Changes commented with "JukS"
+//
 // Revision 1.20  2004/04/08 23:19:52  slicerdw
 // Optimized some code, added a couple of features and fixed minor bugs
 //
@@ -413,7 +417,22 @@ qboolean Pickup_Weapon (edict_t * ent, edict_t * other)
 				SetRespawn(ent, ammo_respawn->value);
 		}
 		return true;
-	
+
+	case MK23MIL_NUM: // Added by JukS (weap pickup)
+		if (other->client->unique_weapon_total >= unique_weapons->value + band)
+			return false;		// we can't get it
+		if ((!allow_hoarding->value) && other->client->inventory[index])
+			return false;		// we already have one
+
+		other->client->inventory[index]++;
+		other->client->unique_weapon_total++;
+		if (!(ent->spawnflags & DROPPED_ITEM)) {
+			other->client->mk23mil_rds = other->client->mk23mil_max;
+		}
+		special = 1;
+		gi.cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
+		break;
+
 	default:
 		other->client->inventory[index]++;
 
@@ -550,8 +569,12 @@ void ChangeWeapon (edict_t * ent)
 			INV_AMMO( ent, GRENADE_NUM ) = 1;
 	}
 
-	if (INV_AMMO(ent, LASER_NUM))
-		SP_LaserSight (ent, GET_ITEM(LASER_NUM));	//item->use(ent, item);
+// Activate laser if player have laser item OR MK23MIL in hand... -JukS- 15.2.2020
+	if (INV_AMMO(ent, LASER_NUM) || ent->client->curr_weap == MK23MIL_NUM)
+		{ SP_LaserSight(ent, GET_ITEM(LASER_NUM)); }
+	else
+		{ ent->client->lasersight = NULL; } // ...othervise disable laser. -JukS- 15.2.2020
+
 }
 
 /*
@@ -880,6 +903,7 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 			//ChangeWeapon( ent );
 		}
 		ent->client->dual_rds = ent->client->mk23_rds;
+		ent->client->mk23mil_rds = ent->client->mk23_rds; // Added by JukS
 	}
 	else if (item->typeNum == KNIFE_NUM)
 	{
@@ -937,6 +961,20 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 			//ChangeWeapon( ent );
 		}
 	}
+	else if (item->typeNum == MK23MIL_NUM) // Added by JukS 12.2.2020 (drop weapon)
+	{
+		if (ent->client->weapon == item && ent->client->inventory[index] == 1)
+		{
+			replacement = GET_ITEM(MK23_NUM);	// back to the pistol then
+			ent->client->newweapon = replacement;
+			ent->client->weaponstate = WEAPON_DROPPING;
+			ent->client->ps.gunframe = 40; // TODO: This should be...? -JukS-
+		}
+		ent->client->unique_weapon_total--;	// dropping 1 unique weapon
+		temp = Drop_Item(ent, item);
+		temp->think = temp_think_specweap;
+		ent->client->inventory[index]--;
+	}
 	else if ((item == ent->client->weapon || item == ent->client->newweapon)
 			&& ent->client->inventory[index] == 1)
 	{
@@ -982,7 +1020,9 @@ void DropSpecialWeapon (edict_t * ent)
 	else if (INV_AMMO(ent, MP5_NUM) > 0)
 		Drop_Weapon (ent, GET_ITEM(MP5_NUM));
 	else if (INV_AMMO(ent, M4_NUM) > 0)
-		Drop_Weapon (ent, GET_ITEM(M4_NUM));
+		Drop_Weapon(ent, GET_ITEM(M4_NUM));
+	else if (INV_AMMO(ent, MK23MIL_NUM) > 0)		// Added by JukS 11.2.2020 (drop special weap)
+		Drop_Weapon(ent, GET_ITEM(MK23MIL_NUM));
 	// special case, aq does this, guess I can support it
 	else if (itemNum == DUAL_NUM)
 		ent->client->newweapon = GET_ITEM(MK23_NUM);
@@ -1014,7 +1054,9 @@ void DropExtraSpecial (edict_t * ent)
 	else if (INV_AMMO(ent, MP5_NUM) > 0	&& MP5_NUM != itemNum)
 		Drop_Weapon (ent, GET_ITEM(MP5_NUM));
 	else if (INV_AMMO(ent, M4_NUM) > 0 && M4_NUM != itemNum)
-		Drop_Weapon (ent, GET_ITEM(M4_NUM));
+		Drop_Weapon(ent, GET_ITEM(M4_NUM));
+	else if (INV_AMMO(ent, MK23MIL_NUM) > 0 && MK23MIL_NUM != itemNum)	// Added by JukS 11.2.2020 (drop extra spec weap)
+		Drop_Weapon(ent, GET_ITEM(MK23MIL_NUM));
 	else
 		gi.dprintf ("Couldn't find the appropriate weapon to drop.\n");
 }
@@ -1022,7 +1064,7 @@ void DropExtraSpecial (edict_t * ent)
 //zucc ready special weapon
 void ReadySpecialWeapon (edict_t * ent)
 {
-	int weapons[5] = { MP5_NUM, M4_NUM, M3_NUM, HC_NUM, SNIPER_NUM };
+	int weapons[6] = { MP5_NUM, M4_NUM, M3_NUM, HC_NUM, SNIPER_NUM, MK23MIL_NUM }; // Modified by JukS 11.2.2020
 	int curr, i;
 	int last;
 
@@ -1031,26 +1073,26 @@ void ReadySpecialWeapon (edict_t * ent)
 		return;
 
 
-	for (curr = 0; curr < 5; curr++)
+	for (curr = 0; curr < 6; curr++)
 	{
 		if (ent->client->curr_weap == weapons[curr])
 			break;
 	}
-	if (curr >= 5)
+	if (curr >= 6)
 	{
 		curr = -1;
-		last = 5;
+		last = 6;
 	}
 	else
 	{
-		last = curr + 5;
+		last = curr + 6;
 	}
 
 	for (i = (curr + 1); i != last; i = (i + 1))
 	{
-		if (INV_AMMO(ent, weapons[i % 5]))
+		if (INV_AMMO(ent, weapons[i % 6]))
 		{
-			ent->client->newweapon = GET_ITEM(weapons[i % 5]);
+			ent->client->newweapon = GET_ITEM(weapons[i % 6]);
 			return;
 		}
 	}
@@ -1267,6 +1309,23 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 			    ATTN_NORM, 0);
 		break;
 	      }
+		case MK23MIL_NUM: // Added by JukS 11.2.2020 (reload sound)
+		{
+			if (ent->client->ps.gunframe == 46)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/mk23out.wav"), 1,
+					ATTN_NORM, 0);
+			else if (ent->client->ps.gunframe == 53)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/mk23in.wav"), 1,
+					ATTN_NORM, 0);
+			else if (ent->client->ps.gunframe == 59)	// 3
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/mk23slap.wav"), 1,
+					ATTN_NORM, 0);
+			break;
+		}
+
 	    default:
 	      gi.dprintf ("No weapon choice for reloading (sounds).\n");
 	      break;
@@ -1371,18 +1430,31 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		  }
 		return;
 	      }
-	    case DUAL_NUM:
-	      {
-		ent->client->dual_rds = ent->client->dual_max;
-		ent->client->mk23_rds = ent->client->mk23_max;
-		(ent->client->inventory[ent->client->ammo_index]) -= 2;
-		if (ent->client->inventory[ent->client->ammo_index] < 0)
-		  {
-		    ent->client->inventory[ent->client->ammo_index] = 0;
-		  }
-		break;
-	      }
-	    default:
+		case DUAL_NUM:
+		{
+			ent->client->dual_rds = ent->client->dual_max;
+			ent->client->mk23_rds = ent->client->mk23_max;
+			(ent->client->inventory[ent->client->ammo_index]) -= 2;
+			if (ent->client->inventory[ent->client->ammo_index] < 0)
+			{
+				ent->client->inventory[ent->client->ammo_index] = 0;
+			}
+			break;
+		}
+		case MK23MIL_NUM: // Added by JukS 11.2.2020 (reload)
+		{
+			ent->client->dual_rds -= ent->client->mk23_rds;
+			ent->client->mk23mil_rds = ent->client->mk23mil_max;
+			ent->client->dual_rds += ent->client->mk23mil_max;
+			(ent->client->inventory[ent->client->ammo_index])--;
+			if (ent->client->inventory[ent->client->ammo_index] < 0)
+			{
+				ent->client->inventory[ent->client->ammo_index] = 0;
+			}
+			ent->client->fired = 0;	// reset any firing delays
+			break;
+		}
+		default:
 	      gi.dprintf ("No weapon choice for reloading.\n");
 	      break;
 	    }
@@ -1398,23 +1470,19 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
       else
 	ent->client->ps.gunframe = FRAME_LASTRD_LAST;
       // see if our weapon has ammo (from something other than reloading)
-      if (
-	  ((ent->client->curr_weap == MK23_NUM)
-	   && (ent->client->mk23_rds > 0))
-	  || ((ent->client->curr_weap == MP5_NUM)
-	      && (ent->client->mp5_rds > 0))
-	  || ((ent->client->curr_weap == M4_NUM) && (ent->client->m4_rds > 0))
-	  || ((ent->client->curr_weap == M3_NUM)
-	      && (ent->client->shot_rds > 0))
-	  || ((ent->client->curr_weap == HC_NUM)
-	      && (ent->client->cannon_rds > 0))
-	  || ((ent->client->curr_weap == SNIPER_NUM)
-	      && (ent->client->sniper_rds > 0))
-	  || ((ent->client->curr_weap == DUAL_NUM)
-	      && (ent->client->dual_rds > 0)))
+	if (
+		   ((ent->client->curr_weap == MK23_NUM) && (ent->client->mk23_rds > 0))
+		|| ((ent->client->curr_weap == MP5_NUM) && (ent->client->mp5_rds > 0))
+		|| ((ent->client->curr_weap == M4_NUM) && (ent->client->m4_rds > 0))
+		|| ((ent->client->curr_weap == M3_NUM) && (ent->client->shot_rds > 0))
+		|| ((ent->client->curr_weap == HC_NUM) && (ent->client->cannon_rds > 0))
+		|| ((ent->client->curr_weap == SNIPER_NUM) && (ent->client->sniper_rds > 0))
+		|| ((ent->client->curr_weap == DUAL_NUM) && (ent->client->dual_rds > 0))
+		|| ((ent->client->curr_weap == MK23MIL_NUM) && (ent->client->mk23mil_rds > 0)) // Added by JukS
+	   )
 	{
-	  ent->client->weaponstate = WEAPON_READY;
-	  ent->client->ps.gunframe = FRAME_IDLE_FIRST;
+		ent->client->weaponstate = WEAPON_READY;
+		ent->client->ps.gunframe = FRAME_IDLE_FIRST;
 	}
       if (((ent->client->latched_buttons | ent->client->buttons) & BUTTON_ATTACK)
 	  && (ent->solid != SOLID_NOT || ent->deadflag == DEAD_DEAD)
@@ -1438,7 +1506,6 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
     {
       if (ent->client->ps.gunframe == FRAME_DEACTIVATE_LAST)
 	{
-
 	  ChangeWeapon (ent);
 	  return;
 	}
@@ -1491,11 +1558,11 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	{
 	case MK23_NUM:
 	  {
-	    if (ent->client->dual_rds >= ent->client->mk23_max)
-	      ent->client->mk23_rds = ent->client->mk23_max;
-	    else
-	      ent->client->mk23_rds = ent->client->dual_rds;
-	    if (ent->client->ps.gunframe == 3)	// 3
+		if (ent->client->dual_rds >= ent->client->mk23_max)
+			ent->client->mk23_rds = ent->client->mk23_max;
+		else
+			ent->client->mk23_rds = ent->client->dual_rds;
+		if (ent->client->ps.gunframe == 3)	// 3
 	      {
 		if (ent->client->mk23_rds > 0)
 		  {
@@ -1577,6 +1644,59 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	    ent->client->burst = 0;
 	    break;
 	  }
+	  {
+	    if (ent->client->dual_rds >= ent->client->mk23_max)
+	      ent->client->mk23_rds = ent->client->mk23_max;
+	    else
+			ent->client->mk23_rds = ent->client->dual_rds;
+			ent->client->mk23_rds = ent->client->mk23mil_rds; // Added by JukS (weap activate)
+		if (ent->client->ps.gunframe == 3)	// 3
+	      {
+		if (ent->client->mk23_rds > 0)
+		  {
+		    gi.sound (ent, CHAN_WEAPON,
+			      gi.soundindex ("weapons/mk23slide.wav"), 1,
+			      ATTN_NORM, 0);
+		  }
+		else
+		  {
+		    gi.sound(ent, CHAN_WEAPON, level.snd_noammo, 1, ATTN_NORM, 0);
+		    //mk23slap
+		    ent->client->ps.gunframe = 62;
+		    ent->client->weaponstate = WEAPON_END_MAG;
+		  }
+	      }
+	    ent->client->fired = 0;	//reset any firing delays
+	    break;
+	  }
+	case MK23MIL_NUM: // Added by JukS 12.2.2020 (weap activate)
+	{
+		{
+			if (ent->client->dual_rds >= ent->client->mk23mil_max)
+				ent->client->mk23mil_rds = ent->client->mk23mil_max;
+			else
+				ent->client->mk23mil_rds = ent->client->dual_rds;
+			if (ent->client->ps.gunframe == 3)	// 3
+			{
+				if (ent->client->mk23mil_rds > 0)
+				{
+					gi.sound(ent, CHAN_WEAPON,
+						gi.soundindex("weapons/mk23slide.wav"), 1,
+						ATTN_NORM, 0);
+				}
+				else
+				{
+					gi.sound(ent, CHAN_WEAPON, level.snd_noammo, 1, ATTN_NORM, 0);
+					//mk23slap
+					ent->client->ps.gunframe = 62;
+					ent->client->weaponstate = WEAPON_END_MAG;
+				}
+			}
+			ent->client->fired = 0;	//reset any firing delays
+			break;
+		}
+	}
+
 	case GRAPPLE_NUM:
 		break;
 
@@ -1877,6 +1997,17 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		bOut = 0;
 		break;
 
+		case MK23MIL_NUM: // Added by JukS 12.2.2020 (weap ready)
+		{
+			if (ent->client->mk23mil_rds > 0)
+			{
+				bFire = 1;
+			}
+			else
+				bOut = 1;
+			break;
+		}
+
 	    default:
 	      {
 		gi.cprintf (ent, PRINT_HIGH,
@@ -2078,11 +2209,12 @@ void weapon_grenade_fire (edict_t * ent, qboolean held)
 
 #define MK23_SPREAD		140
 #define MP5_SPREAD		250 // DW: Changed this back to original from Edition's 240
-#define M4_SPREAD			300
-#define SNIPER_SPREAD 425
-#define DUAL_SPREAD   300 // DW: Changed this back to original from Edition's 275
+#define M4_SPREAD		300
+#define SNIPER_SPREAD	425
+#define DUAL_SPREAD		300 // DW: Changed this back to original from Edition's 275
+#define MK23MIL_SPREAD	120 // Added by JukS 11.2.2020
 
-int AdjustSpread (edict_t * ent, int spread)
+int AdjustSpread(edict_t* ent, int spread)
 {
 	int running = 225;		// minimum speed for running
 	int walking = 10;		// minimum speed for walking
@@ -2093,14 +2225,22 @@ int AdjustSpread (edict_t * ent, int spread)
 	// 225 is running
 	// < 10 will be standing
 	float xyspeed = (ent->velocity[0] * ent->velocity[0] +
-					 ent->velocity[1] * ent->velocity[1]);
+		ent->velocity[1] * ent->velocity[1]);
 
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)	// crouching
 		return (spread * .65);
 
-	if (INV_AMMO(ent, LASER_NUM) && (ent->client->curr_weap == MK23_NUM
-		|| ent->client->curr_weap == MP5_NUM || ent->client->curr_weap == M4_NUM))
+	// Added by JukS - activating laser if...
+	if (ent->client->curr_weap == MK23MIL_NUM) // ...mk23mil: dont care if have laser item or not or...
+	{
 		laser = 1;
+	} // ...activate if laser item AND MK23/MP5/M4...
+	else if (INV_AMMO(ent, LASER_NUM) && (ent->client->curr_weap == MK23_NUM
+	|| ent->client->curr_weap == MP5_NUM || ent->client->curr_weap == M4_NUM))
+	{
+		laser = 1;
+	}
+	else { laser = 0; } // ...othervise don't use laser.
 
 
 	// running
@@ -2160,7 +2300,7 @@ void PlayWeaponSound( edict_t *ent )
 		ent->client->weapon_sound &= ~MZ_BLASTER2;
 
 
-	if( ent->client->weapon_sound & MZ_SILENCED )
+	if( ent->client->weapon_sound & MZ_SILENCED || ent->client->curr_weap == MK23MIL_NUM ) // Added MK23MIL to be forced
 		// Silencer suppresses both sound and muzzle flash.
 		gi.sound( ent, CHAN_WEAPON, level.snd_silencer, 1, ATTN_NORM, 0 );
 
@@ -2296,15 +2436,116 @@ void Pistol_Fire (edict_t * ent)
 	PlayWeaponSound( ent );
 }
 
-void Weapon_MK23 (edict_t * ent)
+void Weapon_MK23(edict_t* ent)
 {
-  //Idle animation entry points - These make the fidgeting look more random
-  static int pause_frames[] = { 13, 22, 40 };
-  //The frames at which the weapon will fire
-  static int fire_frames[] = { 10, 0 };
+	//Idle animation entry points - These make the fidgeting look more random
+	static int pause_frames[] = { 13, 22, 40 };
+	//The frames at which the weapon will fire
+	static int fire_frames[] = { 10, 0 };
 
-  //The call is made...
-  Weapon_Generic (ent, 9, 12, 37, 40, 61, 65, pause_frames, fire_frames, Pistol_Fire);
+	//The call is made...
+	Weapon_Generic(ent, 9, 12, 37, 40, 61, 65, pause_frames, fire_frames, Pistol_Fire);
+}
+
+void MILPistol_Fire (edict_t * ent) // Added by JukS 11.2.2020
+{
+	int i;
+	vec3_t start;
+	vec3_t forward, right;
+	vec3_t angles;
+	int damage = 100; // Increased (90->100) by JukS 11.2.2020
+	int kick = 130; // Decreased (150->130) by JukS 11.2.2020
+	vec3_t offset;
+	int spread = MK23MIL_SPREAD;
+	int height;
+
+
+	if (ent->client->pers.firing_style == ACTION_FIRING_CLASSIC)
+		height = 8;
+	else
+		height = 0;
+
+	//If the user isn't pressing the attack button, advance the frame and go away....
+	if (!(ent->client->buttons & BUTTON_ATTACK))
+	{
+		ent->client->ps.gunframe++;
+		return;
+	}
+	ent->client->ps.gunframe++;
+
+	//Oops! Out of ammo!
+	if (ent->client->mk23mil_rds < 1)
+	{
+		ent->client->ps.gunframe = 13;
+		if (level.framenum >= ent->pain_debounce_framenum)
+		{
+			gi.sound(ent, CHAN_VOICE, level.snd_noammo, 1, ATTN_NORM, 0);
+			ent->pain_debounce_framenum = level.framenum + 1 * HZ;
+		}
+		return;
+	}
+
+
+	//Calculate the kick angles
+	for (i = 1; i < 3; i++)
+	{
+		ent->client->kick_origin[i] = crandom () * 0.3; // Decreased (.35 -> 0.3) by JukS 11.2.2020
+		ent->client->kick_angles[i] = crandom () * 0.6; // Decreased (0.7 -> 0.6) by JukS 11.2.2020
+	}
+	ent->client->kick_origin[0] = crandom () * 0.4; // Decreased (0.5 -> 0.4) by JukS 11.2.2020
+	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.3; // Decreased (-1.5 -> -1.3) by JukS 11.2.2020
+
+	// get start / end positions
+	VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
+	AngleVectors (angles, forward, right, NULL);
+	VectorSet (offset, 0, 8, ent->viewheight - height);
+	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	if (!sv_shelloff->value)
+	{
+		vec3_t result;
+		Old_ProjectSource (ent->client, ent->s.origin, offset, forward, right, result);
+		EjectShell (ent, result, 0);
+	}
+
+	spread = AdjustSpread (ent, spread);
+
+	if (ent->client->pers.mk23mil_mode)
+		spread *= .7;  // Let's keep this same as MK23. Change total spread instead if you want -JukS 11.2.2020
+	//      gi.cprintf(ent, PRINT_HIGH, "Spread is %d\n", spread);
+
+	if ((ent->client->mk23mil_rds == 1))
+	{
+		//Hard coded for reload only.
+		ent->client->ps.gunframe = 62;
+		ent->client->weaponstate = WEAPON_END_MAG;
+	}
+
+	fire_bullet (ent, start, forward, damage, kick, spread, spread, MOD_MK23MIL);
+	
+	Stats_AddShot(ent, MOD_MK23MIL);
+
+	ent->client->mk23_rds--;
+	ent->client->dual_rds--;
+	ent->client->mk23mil_rds--; // Added by JukS 
+
+
+	ent->client->weapon_sound = MZ_BLASTER2;  // Becomes MZ_BLASTER.
+/* No need for this. SOCOM comes with Silencer -JukS-
+	if( INV_AMMO( ent, SIL_NUM ) )
+		ent->client->weapon_sound |= MZ_SILENCED;
+*/
+	PlayWeaponSound( ent );
+}
+
+void Weapon_MK23MIL(edict_t* ent) // USSOCOM MK23 added by JukS (2.2.2020)
+{
+	//Idle animation entry points - These make the fidgeting look more random
+	static int pause_frames[] = { 13, 22, 40 };
+	//The frames at which the weapon will fire
+	static int fire_frames[] = { 10, 0 };
+
+	//The call is made...
+	Weapon_Generic(ent, 9, 12, 37, 40, 61, 65, pause_frames, fire_frames, MILPistol_Fire);
 }
 
 
