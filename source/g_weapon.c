@@ -5,6 +5,11 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: g_weapon.c,v $
+// Revision 1.16  2020/02/16 13:08:00  JukS
+// -Added new weapon, USSOCOM (aka MK23MIL)
+// -Added grenade hit to make damage
+// -Changes commented with "JukS"
+//
 // Revision 1.15  2004/04/08 23:19:51  slicerdw
 // Optimized some code, added a couple of features and fixed minor bugs
 //
@@ -74,7 +79,7 @@
 #include "m_player.h"
 
 
-void knife_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+void knife_touch(edict_t* ent, edict_t* other, cplane_t* plane, csurface_t* surf);
 void Zylon_Grenade (edict_t *ent);
 void setFFState (edict_t *ent);
 
@@ -740,6 +745,17 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	// zucc not needed since grenades don't blow up on contact
 	//ent->enemy = other;
 	//Grenade_Explode(ent);
+
+	// Make some damage if hits to someone -JukS-
+	trace_t tr;
+	vec3_t end;
+
+	PRETRACE();
+	tr = gi.trace(ent->owner->s.origin, NULL, NULL, end, ent->owner, MASK_SHOT);
+	POSTTRACE();
+
+	T_Damage(other, ent, ent->owner, ent->s.origin, tr.endpos, tr.plane.normal, 10, 0, DAMAGE_BULLET, MOD_GRENADE);
+
 }
 
 void fire_grenade2(edict_t *self, vec3_t start, vec3_t aimdir, int damage,

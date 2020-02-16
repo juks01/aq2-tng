@@ -7,7 +7,7 @@
 // $Log: g_combat.c,v $
 // Revision 1.28  2020/02/15 13:13:00  JukS
 // -Added Greaves and MK23MIL (aka USSOCOM)
-// -Added distance damage decreasement with MP5, M4, SSG, MK23MIL
+// -Added distance damage decreasement with MP5 and MK23MIL
 // -Modifications commented with "JukS"
 //
 // Revision 1.27  2002/09/04 11:23:09  ra
@@ -504,27 +504,13 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		case MOD_MP5:
 			// damage reduction for longer range MP5 shots	-- Copied by JukS
 			dist = Distance(targ->s.origin, inflictor->s.origin);
-			if (dist > 1400.0)
+			if (dist > 3000.0)
 				damage = (int)(damage * 1 / 2);
-			else if (dist > 600.0)
+			else if (dist > 1200.0)
 				damage = (int)(damage * 2 / 3);
 			//Fallthrough
 		case MOD_M4:
-			// damage reduction for longer range M4 shots	-- Copied by JukS
-			dist = Distance(targ->s.origin, inflictor->s.origin);
-			if (dist > 1400.0)
-				damage = (int)(damage * 1 / 2);
-			else if (dist > 600.0)
-				damage = (int)(damage * 2 / 3);
-			//Fallthrough
 		case MOD_SNIPER:
-			// damage reduction for longer range SNIPER shots	-- Copied by JukS
-			dist = Distance(targ->s.origin, inflictor->s.origin);
-			if (dist > 2000.0)
-				damage = (int)(damage * 1 / 2);
-			else if (dist > 1000.0)
-				damage = (int)(damage * 2 / 3);
-			//Fallthrough
 		case MOD_KNIFE:
 		case MOD_KNIFE_THROWN:
 
@@ -652,7 +638,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = damage * .225;
+					damage = damage * .325; // Same multiplier as kevlar vest have -JukS-
 					damage_type = LOC_GREAVES;
 					bleeding = 0;
 					instant_dam = 1;
@@ -705,40 +691,54 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					Stats_AddHit(attacker, mod, (gotArmor) ? LOC_KVLR_VEST : LOC_CDAM);
 				}
 
-				if (!gotArmor)
+				if (!gotArmor && (!mod==MOD_SNIPER || !mod==MOD_M4)) // Other than SSG/M4 -JukS-
 				{
 					damage = damage * .65;
 					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
 					if (attacker->client)
 						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
 							client->pers.netname);
-
-					//TempFile bloody gibbing
-					if (mod == MOD_SNIPER && sv_gib->value)
+				}
+				else if (!gotArmor && mod == MOD_SNIPER)
+				{ // Added by JukS - to give some change against SSG...
+					damage = damage * .60; // Decreased (.65 to .60) by JukS
+					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
+					if (attacker->client)
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
+							client->pers.netname);
+					if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
 						ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 				}
-				else if (mod == MOD_SNIPER)
-				{
+				else if (!gotArmor && mod == MOD_M4)
+				{ // Added by JukS - to give some change against M4...
+					damage = damage * .60; // Decreased (.65 to .60) by JukS
+					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
 					if (attacker->client)
-					{
-						gi.cprintf (attacker, PRINT_HIGH, "%s has a Kevlar Vest, too bad you have AP rounds...\n",
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
 							client->pers.netname);
-						gi.cprintf (targ, PRINT_HIGH, "Kevlar Vest absorbed some of %s's AP sniper round\n",
-							attacker->client->pers.netname);
-					}
-					damage = damage * .4; // Increased (.325 -> .4) by JukS
 				}
-				else
+				else if (gotArmor && mod == MOD_SNIPER)
 				{
 					if (attacker->client)
 					{
-						gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest - AIM FOR THE HEAD!\n",
+						gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest, too bad you have AP rounds...\n",
 							client->pers.netname);
-						gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed most of %s's shot\n",
+						gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
-					damage = (int)(damage / 12); // Increased (/10 -> /12) by JukS
+					damage = damage * .325;
+				}
+					else
+					{
+						if (attacker->client)
+						{
+							gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest - AIM FOR THE HEAD!\n",
+								client->pers.netname);
+							gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed most of %s's shot\n",
+								attacker->client->pers.netname);
+						}
+						gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
+					damage = (int)(damage / 10);
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;

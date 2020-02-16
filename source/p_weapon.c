@@ -2453,7 +2453,7 @@ void MILPistol_Fire (edict_t * ent) // Added by JukS 11.2.2020
 	vec3_t start;
 	vec3_t forward, right;
 	vec3_t angles;
-	int damage = 100; // Increased (90->100) by JukS 11.2.2020
+	int damage = 90; // Let's keep same as MK23 by JukS 11.2.2020
 	int kick = 130; // Decreased (150->130) by JukS 11.2.2020
 	vec3_t offset;
 	int spread = MK23MIL_SPREAD;
