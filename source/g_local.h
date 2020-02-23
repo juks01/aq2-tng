@@ -569,24 +569,24 @@ bind 6 "use Sniper Rifle"
 
 #define NO_NUM					0
 
-#define MK23_NUM				1
-#define MP5_NUM					2
-#define M4_NUM					3
-#define M3_NUM					4
-#define HC_NUM					5
-#define SNIPER_NUM				6
-#define DUAL_NUM				7
-#define KNIFE_NUM				8
-#define MK23MIL_NUM				9 // added by JukS (2.2.2020)
-#define GRENADE_NUM				10
+#define MK23_NUM				1 // 1 (weapon_flags)
+#define MP5_NUM					2 // 2
+#define M4_NUM					3 // 4
+#define M3_NUM					4 // 8
+#define HC_NUM					5 // 16
+#define SNIPER_NUM				6 // 32
+#define DUAL_NUM				7 // 64
+#define KNIFE_NUM				8 // 128
+#define MK23MIL_NUM				9 // 256 - added by JukS (2.2.2020)
+#define GRENADE_NUM				10 // 512
 
-#define SIL_NUM					11
-#define SLIP_NUM				12
-#define BAND_NUM				13
-#define KEV_NUM					14
-#define LASER_NUM				15
-#define HELM_NUM				16
-#define GREAVES_NUM				17 // added by JukS (2.2.2020)
+#define SIL_NUM					11 // 1 (itm_flags)
+#define SLIP_NUM				12 // 2
+#define BAND_NUM				13 // 4
+#define KEV_NUM					14 // 8
+#define LASER_NUM				15 // 16
+#define HELM_NUM				16 // 32
+#define GREAVES_NUM				17 // 64 - added by JukS (2.2.2020)
 
 #define MK23_ANUM				18
 #define MP5_ANUM				19
@@ -621,7 +621,7 @@ bind 6 "use Sniper Rifle"
 #define WPF_ALLOWED(typeNum)	((int)wp_flags->value & items[typeNum].flag)
 
 #define ITF_MASK				((1 << ITEM_COUNT) - 1)
-#define ITF_DEFAULT				127 //ITF_MASK
+#define ITF_DEFAULT				125 //ITF_MASK - without old slippers -JukS-
 #define ITF_DEFAULT_STR			TOSTRING(ITF_DEFAULT)
 #define ITF_ALLOWED(typeNum)	((int)itm_flags->value & items[typeNum].flag)
 //AQ2:TNG End adding flags
@@ -942,7 +942,6 @@ extern cvar_t *dmflags;
 extern cvar_t *needpass;
 extern cvar_t *hostname;
 extern cvar_t *teamplay;
-extern cvar_t *greaves; // Added by JukS (1.2.2020)
 extern cvar_t *radiolog;
 extern cvar_t *motd_time;
 extern cvar_t *actionmaps;
@@ -1705,7 +1704,7 @@ struct gclient_s
 	edict_t		*lasersight; // laser
 	edict_t		*flashlight; // Flashlight
 
-	edict_t		*ctf_grapple;		// entity of grapple
+	edict_t*	ctf_grapple;		// entity of grapple
 	int			ctf_grapplestate;		// true if pulling
 	int			ctf_grapplereleaseframe;	// frame of grapple release
 };
@@ -1882,6 +1881,7 @@ typedef struct
 	int team;
 	gitem_t *weapon;
 	gitem_t *item;
+
 }
 gghost_t;
 
@@ -1894,6 +1894,8 @@ void CreateGhost (edict_t * ent);
 //zucc
 void LaserSightThink (edict_t * self);
 void SP_LaserSight (edict_t * self, gitem_t * item);
+void LaserActivate(edict_t* self, edict_t* lasersight);   // for recreated SP_LaserSight code -JukS-
+void LaserDeactivate(edict_t* self, edict_t* lasersight); // for recreated SP_LaserSight code -JukS-
 void Cmd_Reload_f (edict_t * ent);
 void Cmd_New_Reload_f (edict_t * ent);
 void Cmd_New_Weapon_f (edict_t * ent);

@@ -387,6 +387,7 @@ qboolean Pickup_Weapon (edict_t * ent, edict_t * other)
 			other->client->dual_rds += other->client->mk23_max;
 			// assume the player uses the new (full) pistol
 			other->client->mk23_rds = other->client->mk23_max;
+			other->client->mk23mil_rds = other->client->mk23mil_max; // Lets reload SOCOM also -JukS-
 			if(!(ent->spawnflags & DROPPED_PLAYER_ITEM))
 				SetRespawn (ent, weapon_respawn->value);
 		}

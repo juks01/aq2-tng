@@ -138,55 +138,66 @@
  * SP_LaserSight
  *
  * Create/remove the laser sight entity
+ * -- Refactored by JukS
  *---------------------------------------*/
 
 void SP_LaserSight(edict_t * self, gitem_t * item)
 {
-	edict_t *lasersight = self->client->lasersight;
+	edict_t* lasersight = self->client->lasersight; // Define "shortcut" for global element of lasersight
 
-	if (!INV_AMMO(self, LASER_NUM) || !self->client->weapon) {
-		if (lasersight) {  // laser is on
-			G_FreeEdict(lasersight);
-			self->client->lasersight = NULL;
-		}
-		if (!self->client->curr_weap == MK23MIL_NUM) { return; } // Keep laser on if MK23MIL -JukS-
+	if (self->client->weapon) {						// If client have a weapon
+		if (INV_AMMO(self, LASER_NUM)) {			// If client have Lasersight item
+			switch (self->client->weapon->typeNum) {// Check which weapons should be used with laser
+				case MK23_NUM:
+				case MP5_NUM:
+				case M4_NUM:
+				case MK23MIL_NUM:
+					LaserActivate(self, lasersight);// If client have one of those -> Activate laser
+					return;
+				default:							// If no proper weapon for Lasersight...
+					if (lasersight) {
+						LaserDeactivate(self, lasersight); } //  -> Deactivate laser...
+					return;
+			} // end of switch
+		} // end of 'if have lasersight item'
+
+		// Things to do if client haven't got lisersight item:
+		else if (self->client->curr_weap == MK23MIL_NUM) {	// Otherwise if client have SOCOM...
+			LaserActivate(self, lasersight); }				// ...activate laser...
+
+		else {
+			LaserDeactivate(self, lasersight); }			// ...else deactivate laser
+
+	} // end of 'if have weapon'
+	else { LaserDeactivate(self, lasersight); }		// ...if no weapons -> deactivate lasersight.
+}
+
+void LaserActivate(edict_t *self, edict_t* lasersight) // Function to activate lasersight
+{
+	if (!lasersight) {	// First check if lasersight is already not active...
+		lasersight = G_Spawn();							// Create Lasersight element
+		self->client->lasersight = lasersight;			// Define element for user
+		lasersight->owner = self;						// Client owns the lasersight
+		lasersight->movetype = MOVETYPE_NOCLIP;			// Element doesn't 'clip'
+		lasersight->solid = SOLID_NOT;					// Element is not solid
+		lasersight->classname = "lasersight";			// Element class name
+		lasersight->s.modelindex = level.model_lsight;	// model index
+		lasersight->s.renderfx = RF_TRANSLUCENT;		// Element graphical type
+		lasersight->think = LaserSightThink;			// Think method
+		lasersight->nextthink = level.framenum + 1;		// Next think method
+		LaserSightThink(lasersight);					// Call think function
+		VectorCopy(lasersight->s.origin, lasersight->s.old_origin);
+		VectorCopy(lasersight->s.origin, lasersight->old_origin);
 	}
-	
-	//zucc code to make it be used with the right weapons
-	switch (self->client->weapon->typeNum) {
-	case MK23_NUM:
-	case MP5_NUM:
-	case M4_NUM:
-	case MK23MIL_NUM: // Added by JukS 11.2.2020
-		break;
+}
 
-	default:
-		// laser is on but we want it off
-		if (lasersight) {
-			G_FreeEdict(lasersight);
-			self->client->lasersight = NULL;
-		}
-		return;
+void LaserDeactivate(edict_t* self, edict_t* lasersight) // Function to deactivate lasersight
+{
+	if (lasersight) // Check if lasersight is already activated...
+	{
+		G_FreeEdict(self->client->lasersight);			// free lasersight element
+		self->client->lasersight = NULL;				// set global lasersight var to NULL
 	}
-
-	if (lasersight) { //Lasersight is already on
-		return;
-	}
-	else if (!lasersight && self->client->curr_weap == MK23MIL_NUM) {  }
-
-	lasersight = G_Spawn();
-	self->client->lasersight = lasersight;
-	lasersight->owner = self;
-	lasersight->movetype = MOVETYPE_NOCLIP;
-	lasersight->solid = SOLID_NOT;
-	lasersight->classname = "lasersight";
-	lasersight->s.modelindex = level.model_lsight;
-	lasersight->s.renderfx = RF_TRANSLUCENT;
-	lasersight->think = LaserSightThink;
-	lasersight->nextthink = level.framenum + 1;
-	LaserSightThink( lasersight );
-	VectorCopy( lasersight->s.origin, lasersight->s.old_origin );
-	VectorCopy( lasersight->s.origin, lasersight->old_origin );
 }
 
 /*---------------------------------------------
@@ -393,6 +404,7 @@ void Cmd_Reload_f(edict_t * ent)
 	//BD 5/26 - Actually we get here quite often right now. Just exit for weaps that we
 	//          don't want reloaded or that never reload (grenades)
 		// Maybe we could repin grenade by this?
+		// TODO: repinning would be a great idea! -JukS-
 		return;
 	}
 
@@ -731,6 +743,7 @@ void Cmd_Bandage_f(edict_t *ent)
 	}
 
 	// zucc - check if they have a primed grenade
+	// TODO: Maybe we should repin grenade in this stage? -JukS- (02/2020)
 	if (ent->client->curr_weap == GRENADE_NUM
 		&& ((ent->client->ps.gunframe >= GRENADE_IDLE_FIRST
 			&& ent->client->ps.gunframe <= GRENADE_IDLE_LAST)

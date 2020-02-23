@@ -448,11 +448,11 @@ void ED_CallSpawn (edict_t * ent)
 //item[i][0] = the Q2 item to look for
 //item[i][1] = the NS2 item to actually spawn
 
-#define ITEM_SWITCH_COUNT 15
+#define ITEM_SWITCH_COUNT 16
 
 static char *sp_item[ITEM_SWITCH_COUNT][2] = {
   {"weapon_machinegun", "weapon_MP5"},
-  //{"weapon_supershotgun","weapon_HC"},
+  {"weapon_supershotgun","weapon_MK23MIL"}, // Modified by JukS
   {"weapon_bfg", "weapon_M4"},
   {"weapon_shotgun", "weapon_M3"},
   //{"weapon_grenadelauncher","weapon_M203"},
@@ -1604,7 +1604,7 @@ void SP_worldspawn (edict_t * ent)
 	gi.modelindex("#w_sniper.md2");
 	gi.modelindex("#w_akimbo.md2");
 	gi.modelindex("#w_knife.md2");
-	gi.modelindex("#w_mk23.md2"); // Added by JukS - TODO (change to mk23mil model and check if vwep working)
+	gi.modelindex("#w_mk23mil.md2"); // Added by JukS
 	gi.modelindex("#a_m61frag.md2");
 
 	level.model_null = gi.modelindex("sprites/null.sp2");      // null sprite

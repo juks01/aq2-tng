@@ -575,27 +575,6 @@ void SVCmd_Scramble_f(void)
 	}
 }
 
-void SVCmd_Greaves_f()
-{
-	if (gi.argc() < 3)
-	{
-		gi.cprintf(NULL, PRINT_HIGH, "Usage: sv %s 1 to enable or 0 to disable\n", gi.argv(1));
-		return;
-	}
-	else if (atoi(gi.argv(2)) == 1) {
-		greaves->value = 1;
-		gi.bprintf(PRINT_HIGH, "Greaves enabled by console.\n");
-	}
-	else if (atoi(gi.argv(2)) == 0) {
-		greaves->value = 0;
-		gi.bprintf(PRINT_HIGH, "Greaves disabled by console.\n");
-	}
-	else
-	{
-		gi.cprintf(NULL, PRINT_HIGH, "Usage: sv %s 1 to enable or 0 to disable\n", gi.argv(1));
-	}
-}
-
 /*
 =================
 ServerCommand
@@ -646,8 +625,6 @@ void ServerCommand (void)
 		SVCmd_Slap_f ();
 	else if (Q_stricmp(cmd, "scramble") == 0)
 		SVCmd_Scramble_f();
-	else if (Q_stricmp(cmd, "greaves") == 0)		// added Greaves toggle -JukS- (1.2.2020)
-		SVCmd_Greaves_f();
 	else
 		gi.cprintf (NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
 }

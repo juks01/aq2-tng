@@ -622,7 +622,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					}
 					gi.sound(targ, CHAN_ITEM, gi.soundindex("misc/vest.wav"), 1,
 						ATTN_NORM, 0);
-					damage = (int)(damage / 10);
+					damage = (int)(damage / 8); // Decreased (/10 to /8) by JukS
 					damage_type = LOC_GREAVES;
 					bleeding = 0;
 					instant_dam = 1;
@@ -638,11 +638,11 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = damage * .325; // Same multiplier as kevlar vest have -JukS-
+					damage = damage * .285; // Decreased (.325 to .285) by JukS
 					damage_type = LOC_GREAVES;
-					bleeding = 0;
-					instant_dam = 1;
-					stopAP = 1;
+					bleeding = 1;
+					instant_dam = 0;
+					stopAP = 0;
 					do_sparks = 1;
 				}
 				// end of If legdmg with slippers -JukS- (1.2.2020)
@@ -691,31 +691,34 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					Stats_AddHit(attacker, mod, (gotArmor) ? LOC_KVLR_VEST : LOC_CDAM);
 				}
 
-				if (!gotArmor && (!mod==MOD_SNIPER || !mod==MOD_M4)) // Other than SSG/M4 -JukS-
+				if (!gotArmor) // If have no armor...
 				{
-					damage = damage * .65;
-					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-					if (attacker->client)
-						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-							client->pers.netname);
-				}
-				else if (!gotArmor && mod == MOD_SNIPER)
-				{ // Added by JukS - to give some change against SSG...
-					damage = damage * .60; // Decreased (.65 to .60) by JukS
-					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-					if (attacker->client)
-						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-							client->pers.netname);
-					if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
-						ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
-				}
-				else if (!gotArmor && mod == MOD_M4)
-				{ // Added by JukS - to give some change against M4...
-					damage = damage * .60; // Decreased (.65 to .60) by JukS
-					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-					if (attacker->client)
-						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-							client->pers.netname);
+					if (mod == MOD_SNIPER)
+					{ // Added by JukS - to give some change against SSG...
+						damage = damage * .40; // Decreased (.65 to .40) by JukS
+						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
+						if (attacker->client)
+							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
+								client->pers.netname);
+						if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
+							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+					}
+					else if (mod == MOD_M4)
+					{ // Added by JukS - to give some change against M4...
+						damage = damage * .55; // Decreased (.65 to .55) by JukS
+						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
+						if (attacker->client)
+							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
+								client->pers.netname);
+					}
+					else // If have no kevlar vest and weapon is NOT SSG/M4...
+					{
+						damage = damage * .65;
+						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
+						if (attacker->client)
+							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
+								client->pers.netname);
+					}
 				}
 				else if (gotArmor && mod == MOD_SNIPER)
 				{
@@ -738,7 +741,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 								attacker->client->pers.netname);
 						}
 						gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
-					damage = (int)(damage / 10);
+					damage = (int)(damage / 11); // Increased (/10 to /11) by JukS
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;

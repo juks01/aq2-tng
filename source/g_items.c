@@ -1342,10 +1342,10 @@ world_model_flags int               copied to 'ent->s.effects' (see s.effects fo
    Weapon_MK23MIL,
    //"misc/w_pkup.wav",
    NULL,
-   "models/weapons/g_mk23mil/tris.md2", // TODO: model for MK23MIL (v_wep)
+   "models/weapons/g_mk23mil/tris.md2", // TODO: model for MK23MIL (ground)
    0,
    "models/weapons/v_mk23mil/tris.md2", // TOOD: model for MK23MIL (hand)
-   "w_mk23mil",						// TODO?
+   "w_mk23",							// TODO? model for MK23MIL (vwep)
    MK23MIL_NAME,
    0,
    1,

@@ -86,9 +86,9 @@
 
 // AQ2:TNG Deathwatch - Updated the Version variables to show TNG Stuff
 #ifndef VERSION
-#define VERSION "2.81 git (JukS-mod)"
+#define VERSION "2.81 git (JukS-mod BETA)"
 #endif
-#define TNG_TITLE "AQ2: The Next Generation"
+#define TNG_TITLE "AQ2: The Next Generation (JukS-mod BETA)"
 // AQ2:TNG Deathwatch End
 //AQ2:TNG Slicer This is the max players writen on last killed target
 //SLIC2

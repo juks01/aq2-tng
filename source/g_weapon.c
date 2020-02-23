@@ -7,7 +7,8 @@
 // $Log: g_weapon.c,v $
 // Revision 1.16  2020/02/16 13:08:00  JukS
 // -Added new weapon, USSOCOM (aka MK23MIL)
-// -Added grenade hit to make damage
+// -Added grenade hit to make damage by speed.
+//  Grenades with low speeds (<500) will just bounce away like earlier.
 // -Changes commented with "JukS"
 //
 // Revision 1.15  2004/04/08 23:19:51  slicerdw
@@ -746,16 +747,22 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	//ent->enemy = other;
 	//Grenade_Explode(ent);
 
-	// Make some damage if hits to someone -JukS-
-	trace_t tr;
-	vec3_t end;
+	// New stuff: Make some damage if hits to someone -JukS-
+	// Velocities by Throw type around: Long(950), Medium(740), Short(460)
 
-	PRETRACE();
-	tr = gi.trace(ent->owner->s.origin, NULL, NULL, end, ent->owner, MASK_SHOT);
-	POSTTRACE();
-
-	T_Damage(other, ent, ent->owner, ent->s.origin, tr.endpos, tr.plane.normal, 10, 0, DAMAGE_BULLET, MOD_GRENADE);
-
+	float grenSpeed = VectorNormalize(ent->velocity);
+//	gi.dprintf("GrenSpeed: %f\n", grenSpeed); // for debugging
+	if (grenSpeed > 500) // Don't make damage with slow speeds
+	{
+		trace_t tr;
+		vec3_t end;
+		int dmgBySpeed = (int)(grenSpeed) / 100;
+//		gi.dprintf("GrenHitDmg: %d\n", dmgBySpeed); // for debugging
+		PRETRACE();
+		tr = gi.trace(ent->owner->s.origin, NULL, NULL, end, ent->owner, MASK_SHOT);
+		POSTTRACE();
+		T_Damage(other, ent, ent->owner, ent->s.origin, tr.endpos, tr.plane.normal, dmgBySpeed, 0, DAMAGE_NO_ARMOR, MOD_GRENADE);
+	}
 }
 
 void fire_grenade2(edict_t *self, vec3_t start, vec3_t aimdir, int damage,

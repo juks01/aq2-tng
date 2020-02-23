@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------------------------------
 // $Log: p_client.c,v $
+// Revision 1.90  2020/02/23 18:44:00  JukS
+// Added new weapon: MK23MIL (aka SOCOM) -by JukS-
+// All modifications commented with "JukS"
+//
 // Revision 1.90  2004/09/23 00:09:44  slicerdw
 // Radio kill count was missing for falling death
 //
@@ -2102,9 +2106,9 @@ void EquipClient(edict_t * ent)
 		client->unique_weapon_total = 1;
 		item = GET_ITEM(MK23_ANUM); // Add regular bullets (MK23 clips)
 		if (band)
-			client->inventory[ITEM_INDEX(item)] = 2;
+			client->inventory[ITEM_INDEX(item)] = 3;
 		else
-			client->inventory[ITEM_INDEX(item)] = 1;
+			client->inventory[ITEM_INDEX(item)] = 2;
 		client->mk23mil_rds = client->mk23mil_max;
 		break;
 	case KNIFE_NUM:
@@ -2335,7 +2339,7 @@ void PutClientInServer(edict_t * ent)
 	client->mp5_max = 30;
 	client->m4_max = 24;
 	client->shot_max = 7;
-	client->sniper_max = 5;
+	client->sniper_max = 6;
 	client->cannon_max = 2;
 	client->dual_max = 24;
 	if (WPF_ALLOWED( MK23_NUM )) {
