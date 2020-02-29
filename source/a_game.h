@@ -86,7 +86,7 @@
 
 // AQ2:TNG Deathwatch - Updated the Version variables to show TNG Stuff
 #ifndef VERSION
-#define VERSION "2.81 git (JukS-mod BETA)"
+#define VERSION "2.81j git"
 #endif
 #define TNG_TITLE "AQ2: The Next Generation (JukS-mod BETA)"
 // AQ2:TNG Deathwatch End

@@ -2000,12 +2000,15 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 
 		case MK23MIL_NUM: // Added by JukS 12.2.2020 (weap ready)
 		{
-			if (ent->client->mk23mil_rds > 0)
+			if (ent->client->mk23mil_rds > 0) // If have bullets
 			{
-				bFire = 1;
+				if (ent->client->pers.mk23mil_mode != 0 && ent->client->fired == 0) {
+					ent->client->fired = 1; // Mark as fired. Semo-automatic stuff
+					bFire = 1; }
+				else if (ent->client->pers.mk23mil_mode == 0) {
+					bFire = 1;	}
 			}
-			else
-				bOut = 1;
+			else bOut = 1;
 			break;
 		}
 
@@ -2923,8 +2926,8 @@ void HC_Fire (edict_t * ent)
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
-	VectorScale (forward, -2, ent->client->kick_origin);
-	ent->client->kick_angles[0] = -2;
+	VectorScale (forward, -20, ent->client->kick_origin); // Added a bit more screen effect (-2 to -20) -JukS-
+	ent->client->kick_angles[0] = -20;
 
 	VectorSet (offset, 0, 8, ent->viewheight - height);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
