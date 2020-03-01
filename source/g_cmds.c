@@ -824,6 +824,8 @@ static void Cmd_Use_f (edict_t * ent)
 				itemNum = M4_NUM;
 			else if (!Q_stricmp(s, "grenades"))
 				itemNum = GRENADE_NUM;
+			else if (!Q_stricmp(s, "rocket launcher")) // Added by JukS
+				itemNum = MK23MIL_NUM;
 		}
 	}
 

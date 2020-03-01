@@ -387,7 +387,7 @@ qboolean Pickup_Weapon (edict_t * ent, edict_t * other)
 			other->client->dual_rds += other->client->mk23_max;
 			// assume the player uses the new (full) pistol
 			other->client->mk23_rds = other->client->mk23_max;
-			other->client->mk23mil_rds = other->client->mk23mil_max; // Lets reload SOCOM also -JukS-
+//			other->client->mk23mil_rds = other->client->mk23mil_max; // Separate MIL from MK23 ammo -JukS-
 			if(!(ent->spawnflags & DROPPED_PLAYER_ITEM))
 				SetRespawn (ent, weapon_respawn->value);
 		}
@@ -904,7 +904,7 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 			//ChangeWeapon( ent );
 		}
 		ent->client->dual_rds = ent->client->mk23_rds;
-		ent->client->mk23mil_rds = ent->client->mk23_rds; // Added by JukS
+//		ent->client->mk23mil_rds = ent->client->mk23_rds; // Separate MIL from MK23 ammo -JukS-
 	}
 	else if (item->typeNum == KNIFE_NUM)
 	{
@@ -1444,9 +1444,9 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		}
 		case MK23MIL_NUM: // Added by JukS 11.2.2020 (reload)
 		{
-			ent->client->dual_rds -= ent->client->mk23_rds;
+//			ent->client->dual_rds -= ent->client->mk23_rds;			// separate MIL from MK23 ammo -JukS-
 			ent->client->mk23mil_rds = ent->client->mk23mil_max;
-			ent->client->dual_rds += ent->client->mk23mil_max;
+//			ent->client->dual_rds += ent->client->mk23mil_max;		// separate MIL from MK23 ammo -JukS-
 			(ent->client->inventory[ent->client->ammo_index])--;
 			if (ent->client->inventory[ent->client->ammo_index] < 0)
 			{
@@ -1650,7 +1650,7 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	      ent->client->mk23_rds = ent->client->mk23_max;
 	    else
 			ent->client->mk23_rds = ent->client->dual_rds;
-			ent->client->mk23_rds = ent->client->mk23mil_rds; // Added by JukS (weap activate)
+//			ent->client->mk23_rds = ent->client->mk23mil_rds; // Separate MIL from MK23 ammo -JukS-
 		if (ent->client->ps.gunframe == 3)	// 3
 	      {
 		if (ent->client->mk23_rds > 0)
@@ -1673,10 +1673,12 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	case MK23MIL_NUM: // Added by JukS 12.2.2020 (weap activate)
 	{
 		{
+/* Separate MIL from MK23 ammo -JukS-
 			if (ent->client->dual_rds >= ent->client->mk23mil_max)
 				ent->client->mk23mil_rds = ent->client->mk23mil_max;
 			else
 				ent->client->mk23mil_rds = ent->client->dual_rds;
+*/
 			if (ent->client->ps.gunframe == 3)	// 3
 			{
 				if (ent->client->mk23mil_rds > 0)
@@ -2528,8 +2530,8 @@ void MILPistol_Fire (edict_t * ent) // Added by JukS 11.2.2020
 	
 	Stats_AddShot(ent, MOD_MK23MIL);
 
-	ent->client->mk23_rds--;
-	ent->client->dual_rds--;
+//	ent->client->mk23_rds--; // Separated MIL from MK23 ammo -JukS-
+//	ent->client->dual_rds--; // Separated MIL from MK23 ammo -JukS-
 	ent->client->mk23mil_rds--; // Added by JukS 
 
 
