@@ -2928,9 +2928,6 @@ void HC_Fire (edict_t * ent)
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
-	VectorScale (forward, -20, ent->client->kick_origin); // Added a bit more screen effect (-2 to -20) -JukS-
-	ent->client->kick_angles[0] = -20;
-
 	VectorSet (offset, 0, 8, ent->viewheight - height);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
@@ -2951,6 +2948,9 @@ void HC_Fire (edict_t * ent)
 	{
 		// Single barrel.
 
+		VectorScale(forward, -5, ent->client->kick_origin); // Added a bit more screen effect (-2 to -5) -JukS-
+		ent->client->kick_angles[0] = -5;
+
 		if (ent->client->cannon_rds == 2)
 			v[YAW] = ent->client->v_angle[YAW] - ((0.5) / 2);
 		else
@@ -2966,6 +2966,9 @@ void HC_Fire (edict_t * ent)
 	{
 		// Both barrels.
 
+		VectorScale(forward, -15, ent->client->kick_origin); // Added a bit more screen effect (-2 to -15) -JukS-
+		ent->client->kick_angles[0] = -15;
+
 		v[YAW] = ent->client->v_angle[YAW] - 5;
 		AngleVectors (v, forward, NULL, NULL);
 		fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4, 34 / 2, MOD_HC);
@@ -2974,6 +2977,13 @@ void HC_Fire (edict_t * ent)
 		AngleVectors (v, forward, NULL, NULL);
 		fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4 /* was *5 here */, 34 / 2, MOD_HC);
 
+		// HC Kickback -JukS-
+		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+		ent->velocity[0] += forward[0] * -500;
+		ent->velocity[1] += forward[1] * -500;
+		ent->velocity[2] += forward[2] * -100; // upwards
+		// HC Kickback -JukS
+
 		ent->client->cannon_rds -= 2;
 	}
 
@@ -2981,7 +2991,6 @@ void HC_Fire (edict_t * ent)
 	ProduceShotgunDamageReport (ent);	//FB 6/3/99
 
 	ent->client->ps.gunframe++;
-
 
 	ent->client->weapon_sound = MZ_SSHOTGUN;
 	PlayWeaponSound( ent );
