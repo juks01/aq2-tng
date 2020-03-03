@@ -2908,6 +2908,24 @@ void Weapon_M3 (edict_t * ent)
   Weapon_Generic (ent, 7, 15, 35, 41, 52, 60, pause_frames, fire_frames, M3_Fire);
 }
 
+// Weapon recoil script for AQ2 by JukS
+// Thanks for tips to QwazyWabbit and ...
+void Weapon_Recoil(edict_t* ent, float vertical, float horizontal)
+{
+	if (ent->client) // only players get recoil
+	{
+		vec3_t    end, forward, dir;
+		vec_t speed = VectorLength(ent->velocity);
+
+		gi.dprintf("Speed: %f\n", speed); // For debugging
+		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+
+		ent->velocity[0] += forward[0] * -vertical; // X
+		ent->velocity[1] += forward[1] * -vertical; // Y
+		ent->velocity[2] += forward[2] * -horizontal; // Z (up/down)
+	}
+}
+
 // AQ2:TNG Deathwatch - Modified to use Single Barreled HC Mode
 void HC_Fire (edict_t * ent)
 {
@@ -2970,19 +2988,15 @@ void HC_Fire (edict_t * ent)
 		ent->client->kick_angles[0] = -15;
 
 		v[YAW] = ent->client->v_angle[YAW] - 5;
-		AngleVectors (v, forward, NULL, NULL);
-		fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4, 34 / 2, MOD_HC);
+		AngleVectors(v, forward, NULL, NULL);
+		fire_shotgun(ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4, 34 / 2, MOD_HC);
 
 		v[YAW] = ent->client->v_angle[YAW] + 5;
-		AngleVectors (v, forward, NULL, NULL);
-		fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4 /* was *5 here */, 34 / 2, MOD_HC);
+		AngleVectors(v, forward, NULL, NULL);
+		fire_shotgun(ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4 /* was *5 here */, 34 / 2, MOD_HC);
 
-		// HC Kickback -JukS-
-		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
-		ent->velocity[0] += forward[0] * -500;
-		ent->velocity[1] += forward[1] * -500;
-		ent->velocity[2] += forward[2] * -100; // upwards
-		// HC Kickback -JukS
+		// Call recoil for player. 500 vertical, 100 horizontal. -JukS-
+		Weapon_Recoil(ent, 100, 100);
 
 		ent->client->cannon_rds -= 2;
 	}
