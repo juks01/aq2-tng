@@ -2909,20 +2909,21 @@ void Weapon_M3 (edict_t * ent)
 }
 
 // Weapon recoil script for AQ2 by JukS
-// Thanks for tips to QwazyWabbit and ...
-void Weapon_Recoil(edict_t* ent, float vertical, float horizontal)
+// Thanks for tips to QwazyWabbit and eukara
+void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil)
 {
 	if (ent->client) // only players get recoil
 	{
-		vec3_t    end, forward, dir;
-		vec_t speed = VectorLength(ent->velocity);
+		vec3_t forward;
+		// disabled for now... Used to count player speed
+		//		vec_t speed = VectorLength(ent->velocity);
 
-		gi.dprintf("Speed: %f\n", speed); // For debugging
 		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
 
-		ent->velocity[0] += forward[0] * -vertical; // X
-		ent->velocity[1] += forward[1] * -vertical; // Y
-		ent->velocity[2] += forward[2] * -horizontal; // Z (up/down)
+		// Horizontal boost first so recoil works when shooting a bit downwards
+		ent->velocity[2] += forward[2] * -hRecoil; // Z (up/down)
+		ent->velocity[0] += forward[0] * -vRecoil; // X
+		ent->velocity[1] += forward[1] * -vRecoil; // Y
 	}
 }
 
@@ -2995,8 +2996,8 @@ void HC_Fire (edict_t * ent)
 		AngleVectors(v, forward, NULL, NULL);
 		fire_shotgun(ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4 /* was *5 here */, 34 / 2, MOD_HC);
 
-		// Call recoil for player. 500 vertical, 100 horizontal. -JukS-
-		Weapon_Recoil(ent, 100, 100);
+		// Call recoil for player. 300 vertical, 100 horizontal. -JukS-
+		Weapon_Recoil(ent, 300, 100);
 
 		ent->client->cannon_rds -= 2;
 	}

@@ -1353,7 +1353,7 @@ void Weapon_Generic( edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST
 	int FRAME_RELOAD_LAST, int FRAME_LASTRD_LAST,
 	int *pause_frames, int *fire_frames,
 	void( *fire ) (edict_t * ent) );
-void Weapon_Recoil(edict_t* ent, float vertical, float horizontal); // Added by JukS (3.3.2020)
+void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil); // Added by JukS (3.3.2020)
 void PlayWeaponSound( edict_t *ent );
 
 void P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
