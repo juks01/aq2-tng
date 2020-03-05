@@ -254,7 +254,7 @@ irc_connect ( void )
 	  strcpy (ircstatus->string, IRC_ST_DISABLED);
 	} else {
 #endif
-	  sprintf (outbuf, "NICK %s\nUSER tng-mbot * * :%s\n", irc_data.ircuser, hostname->string);
+	  Com_Printf(outbuf, "NICK %s\nUSER tng-mbot * * :%s\n", irc_data.ircuser, hostname->string); // Fixed. Old: sprintf() -JukS-
 	  send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 	  if (ircdebug->value)
 	    gi.dprintf("IRC: >> NICK %s\nIRC: >> USER tng-mbot * * :%s\n", irc_data.ircuser, hostname->string);
@@ -316,22 +316,22 @@ irc_parse ( void )
 	  // Maybe Future Extesion
 	}
       } else if (Q_strnicmp (&irc_data.input[pos], "004 ", 4) == 0) {
-	sprintf(outbuf, "mode %s +i\n", irc_data.ircuser);
+    Com_Printf(outbuf, "mode %s +i\n", irc_data.ircuser); // Fixed. Old: sprintf() -JukS-
 	if (ircdebug->value)
 	  gi.dprintf("IRC: >> mode %s +i set\n", irc_data.ircuser);
 	send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 
 	if (irc_data.ircpasswd[0]) {
-	  sprintf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd);
+      Com_Printf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd); // Fixed. Old: sprintf() -JukS-
 	  gi.dprintf ("IRC: trying to join channel %s %s\n", irc_data.ircchannel, irc_data.ircpasswd);
 	  send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
-	  sprintf (outbuf, "mode %s +mntk %s\n", irc_data.ircchannel, irc_data.ircpasswd);
+      Com_Printf(outbuf, "mode %s +mntk %s\n", irc_data.ircchannel, irc_data.ircpasswd); // Fixed. Old: sprintf() -JukS-
 	  send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 	} else {
-	  sprintf(outbuf, "join %s\n", irc_data.ircchannel);
+	  Com_Printf(outbuf, "join %s\n", irc_data.ircchannel); // Fixed. Old: sprintf() -JukS-
 	  gi.dprintf ("IRC: trying to join channel %s\n", irc_data.ircchannel);
 	  send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
-	  sprintf (outbuf, "mode %s +mnt\n", irc_data.ircchannel);
+	  Com_Printf(outbuf, "mode %s +mnt\n", irc_data.ircchannel); // Fixed. Old: sprintf() -JukS-
 	  send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 	}
 	
@@ -372,11 +372,11 @@ irc_parse ( void )
       } else if (strstr (irc_data.input, irc_data.ircuser)) {
 	if (strstr (irc_data.input, " KICK ") || strstr (irc_data.input, "kick")) {
 	  if (irc_data.ircpasswd[0]) {
-	    sprintf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd);
+        Com_Printf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd); // Fixed. Old: sprintf() -JukS-
 	    gi.dprintf ("IRC: trying to join channel %s %s (got kicked)\n", irc_data.ircchannel, irc_data.ircpasswd);
 	    send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 	  } else {
-	    sprintf(outbuf, "join %s\n", irc_data.ircchannel);
+        Com_Printf(outbuf, "join %s\n", irc_data.ircchannel); // Fixed. Old: sprintf() -JukS-
 	    gi.dprintf ("IRC: trying to join channel %s (got kicked)\n", irc_data.ircchannel);
 	    send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
 	  }
@@ -644,27 +644,27 @@ IRC_printf (int type, char *fmt, ... )
       topic[tpos] = 0;
       va_end(ap);
       // print it
-      sprintf (outbuf, "PRIVMSG %s :%s\n", irc_data.ircchannel, message);
+      Com_Printf(outbuf, "PRIVMSG %s :%s\n", irc_data.ircchannel, message); // Fixed. Old: sprintf() -JukS-
       if (ircdebug->value)
 	gi.dprintf ("IRC: >> %s", outbuf);
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
       if ((type == IRC_T_TOPIC) && (ircmlevel->value >= IRC_T_TOPIC)) {
-	sprintf (outbuf, "TOPIC %s :%s %s\n", irc_data.ircchannel, irctopic->string, topic);
+      Com_Printf(outbuf, "TOPIC %s :%s %s\n", irc_data.ircchannel, irctopic->string, topic); // Fixed. Old: sprintf() -JukS-
 	send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
       }
     }
   } else if (irc_data.ircstatus == IRC_CONNECTED) {
     if (irc_data.ircpasswd[0]) {
-      sprintf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd);
+      Com_Printf(outbuf, "join %s %s\n", irc_data.ircchannel, irc_data.ircpasswd); // Fixed. Old: sprintf() -JukS-
       gi.dprintf ("IRC: trying to join channel %s %s\n", irc_data.ircchannel, irc_data.ircpasswd);
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
-      sprintf (outbuf, "mode %s +mntk %s\n", irc_data.ircchannel, irc_data.ircpasswd);
+      Com_Printf(outbuf, "mode %s +mntk %s\n", irc_data.ircchannel, irc_data.ircpasswd); // Fixed. Old: sprintf() -JukS-
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
     } else {
-      sprintf(outbuf, "join %s\n", irc_data.ircchannel);
+      Com_Printf(outbuf, "join %s\n", irc_data.ircchannel); // Fixed. Old: sprintf() -JukS-
       gi.dprintf ("IRC: trying to join channel %s\n", irc_data.ircchannel);
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
-      sprintf (outbuf, "mode %s +mnt\n", irc_data.ircchannel);
+      Com_Printf(outbuf, "mode %s +mnt\n", irc_data.ircchannel); // Fixed. Old: sprintf() -JukS-
       send (irc_data.ircsocket, outbuf, strlen(outbuf), 0);
     }
   }

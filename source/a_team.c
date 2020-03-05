@@ -2881,14 +2881,15 @@ void A_ScoreboardMessage (edict_t * ent, edict_t * killer)
 			else if( minutes < 600 )
 				snprintf( time_buf, 6, " %1i:%02i", minutes / 60, minutes % 60 );
 			else
-				snprintf( time_buf, 6, " %3ih", min( 999, minutes / 60 ) );
-			snprintf( ping_buf,   6, " %4i", min( 9999, cl->ping ) );
-			snprintf( caps_buf,   6, " %4i", min( 9999, cl->resp.ctf_caps ) );
-			snprintf( score_buf,  7, " %5i", min( 99999, cl->resp.score) );
-			snprintf( kills_buf,  7, " %5i", min( 99999, cl->resp.kills) );
-			snprintf( deaths_buf, 8, " %6i", min( 999999, cl->resp.deaths) );
-			snprintf( damage_buf, 8, " %6i", min( 999999, cl->resp.damage_dealt) );
-			snprintf( acc_buf   , 5, " %3.f", cl->resp.shotsTotal ? (double) cl->resp.hitsTotal * 100.0 / (double) cl->resp.shotsTotal : 0. );
+				Com_Printf( time_buf,   6, " %3ih", min( 999, minutes / 60 ) );
+
+			Com_Printf( ping_buf,   6, " %4i", min( 9999, cl->ping ) );
+			Com_Printf( caps_buf,   6, " %4i", min( 9999, cl->resp.ctf_caps ) );
+			Com_Printf( score_buf,  7, " %5i", min( 99999, cl->resp.score) );
+			Com_Printf( kills_buf,  7, " %5i", min( 99999, cl->resp.kills) );
+			Com_Printf( deaths_buf, 8, " %6i", min( 999999, cl->resp.deaths) );
+			Com_Printf( damage_buf, 8, " %6i", min(999999, cl->resp.damage_dealt));
+			Com_Printf( acc_buf,    5, " %3.f", cl->resp.shotsTotal ? (double) cl->resp.hitsTotal * 100.0 / (double) cl->resp.shotsTotal : 0. );
 
 			sprintf( string + strlen(string), "yv %d string \"%s%-15s%s%s%s%s%s%s%s%s\"",
 				line_y,
