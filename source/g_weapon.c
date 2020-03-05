@@ -747,17 +747,15 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	//ent->enemy = other;
 	//Grenade_Explode(ent);
 
-	// New stuff: Make some damage if hits to someone -JukS-
-	// Velocities by Throw type around: Long(950), Medium(740), Short(460)
-
+	// New stuff: Make some damage if grenade hits to someone -JukS-
+	// Grenade velocities by Throw type around: Long(950), Medium(740), Short(460)
 	float grenSpeed = VectorNormalize(ent->velocity);
-//	gi.dprintf("GrenSpeed: %f\n", grenSpeed); // for debugging
 	if (grenSpeed > 500) // Don't make damage with slow speeds
 	{
 		trace_t tr;
 		vec3_t end;
-		int dmgBySpeed = (int)(grenSpeed) / 100;
-//		gi.dprintf("GrenHitDmg: %d\n", dmgBySpeed); // for debugging
+		// Formula to handle damage amount. With /25-20 we'll get 0 dmg at minimum speed (500)
+		int dmgBySpeed = (int)(grenSpeed) / 25 - 20; 
 		PRETRACE();
 		tr = gi.trace(ent->owner->s.origin, NULL, NULL, end, ent->owner, MASK_SHOT);
 		POSTTRACE();
