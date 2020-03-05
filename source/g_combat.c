@@ -489,7 +489,6 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	// base damage is head shot damage, so all the scaling is downwards
 	if (client)
 	{
-
 		switch (mod) {
 		case MOD_MK23:
 		case MOD_DUAL:
@@ -506,7 +505,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			dist = Distance(targ->s.origin, inflictor->s.origin);
 			if (dist > 3000.0)
 				damage = (int)(damage * 1 / 2);
-			else if (dist > 1200.0)
+			else if (dist > 2000.0)
 				damage = (int)(damage * 2 / 3);
 			//Fallthrough
 		case MOD_M4:
@@ -731,21 +730,21 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					}
 					damage = damage * .325;
 				}
-					else
+				else
+				{
+					if (attacker->client)
 					{
-						if (attacker->client)
-						{
-							gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest - AIM FOR THE HEAD!\n",
-								client->pers.netname);
-							gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed most of %s's shot\n",
-								attacker->client->pers.netname);
-						}
-						gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
-					damage = (int)(damage / 11); // Increased (/10 to /11) by JukS
-					bleeding = 0;
-					instant_dam = 1;
-					stopAP = 1;
-					do_sparks = 1;
+						gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest - AIM FOR THE HEAD!\n",
+							client->pers.netname);
+						gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed most of %s's shot\n",
+							attacker->client->pers.netname);
+					}
+					gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
+				damage = (int)(damage / 8); // Damage increased (/10 to /8) by JukS
+				bleeding = 0;
+				instant_dam = 1;
+				stopAP = 1;
+				do_sparks = 1;
 				}
 			}
 			break;

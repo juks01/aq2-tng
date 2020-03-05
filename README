@@ -1,0 +1,29 @@
+Action Quake 2 TNG - JukS mod
+=============================
+
+Gameplay modifications
+----------------------
+1. New item: Stealth Slippers & Greaves
+	-now you have kevlar armor for legs with old stealth slippers
+	-your legs wont brake by bullets, only by falling damage
+	-still able to change to old slippers with itm_flags
+
+2. New weapon: Military MK23 SOCOM pistol
+	-better version of regular MK23 pistol
+	-already silencer and lasersight attached
+
+3. Some damage modifications
+	-kevlar vest piercing damage increased a bit
+	-chest damage decreased a bit with SSG and M4
+	-ranged damage modification for MP5
+	
+4. Weapon recoil-kickback added
+	-HC in dual barrel mode +150 points (normal running speed is 300)
+	-HC in single barrel mode +75
+	-M3 +50
+	-SSG +30 (small, because no sense to make SSG better in any way)
+	-M4 +10
+
+5. Silencer item doesn't count as special item
+	-if you select silencer you can pick up any other item
+	-if you have any other item you can pick up silencer

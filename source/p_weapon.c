@@ -2350,6 +2350,25 @@ void PlayWeaponSound( edict_t *ent )
 	level.weapon_sound_framenum = level.framenum;
 }
 
+// Weapon recoil script for AQ2 by JukS
+// Thanks for tips to QwazyWabbit and eukara
+void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil)
+{
+	if (ent->client) // only players get recoil
+	{
+		vec3_t forward;
+		// disabled for now... Used to count player speed
+		//		vec_t speed = VectorLength(ent->velocity);
+
+		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+
+		// Horizontal boost first so recoil works when shooting a bit downwards
+		ent->velocity[2] += forward[2] * -hRecoil; // Z (up/down)
+		ent->velocity[0] += forward[0] * -vRecoil; // X
+		ent->velocity[1] += forward[1] * -vRecoil; // Y
+	}
+}
+
 
 //======================================================================
 // mk23 derived from tutorial by GreyBear
@@ -2780,7 +2799,7 @@ void M4_Fire (edict_t * ent)
 
 	fire_bullet_sparks (ent, start, forward, damage, kick, spread, spread, MOD_M4);
 	Stats_AddShot(ent, MOD_M4);
-
+	Weapon_Recoil(ent, 10, 10); // Add some recoil... -JukS-
 	ent->client->m4_rds--;
 
 	if (!sv_shelloff->value)
@@ -2893,6 +2912,7 @@ void M3_Fire (edict_t * ent)
 
 	//if (!DMFLAGS(DF_INFINITE_AMMO))
 	//      ent->client->inventory[ent->client->ammo_index]--;
+	Weapon_Recoil(ent, 50, 50);  // Add some recoil... -JukS-
 	ent->client->shot_rds--;
 
 
@@ -2906,25 +2926,6 @@ void Weapon_M3 (edict_t * ent)
   static int fire_frames[] = { 8, 9, 14, 0 };
 
   Weapon_Generic (ent, 7, 15, 35, 41, 52, 60, pause_frames, fire_frames, M3_Fire);
-}
-
-// Weapon recoil script for AQ2 by JukS
-// Thanks for tips to QwazyWabbit and eukara
-void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil)
-{
-	if (ent->client) // only players get recoil
-	{
-		vec3_t forward;
-		// disabled for now... Used to count player speed
-		//		vec_t speed = VectorLength(ent->velocity);
-
-		AngleVectors(ent->client->v_angle, forward, NULL, NULL);
-
-		// Horizontal boost first so recoil works when shooting a bit downwards
-		ent->velocity[2] += forward[2] * -hRecoil; // Z (up/down)
-		ent->velocity[0] += forward[0] * -vRecoil; // X
-		ent->velocity[1] += forward[1] * -vRecoil; // Y
-	}
 }
 
 // AQ2:TNG Deathwatch - Modified to use Single Barreled HC Mode
@@ -2978,7 +2979,7 @@ void HC_Fire (edict_t * ent)
 
 		//half the spread, half the pellets?
 		fire_shotgun (ent, start, forward, sngl_damage, sngl_kick, DEFAULT_SHOTGUN_HSPREAD * 2.5, DEFAULT_SHOTGUN_VSPREAD * 2.5, 34 / 2, MOD_HC);
-
+		Weapon_Recoil(ent, 75, 75);  // Add some recoil... -JukS-
 		ent->client->cannon_rds --;
 	}
 	else
@@ -2995,9 +2996,7 @@ void HC_Fire (edict_t * ent)
 		v[YAW] = ent->client->v_angle[YAW] + 5;
 		AngleVectors(v, forward, NULL, NULL);
 		fire_shotgun(ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD * 4, DEFAULT_SHOTGUN_VSPREAD * 4 /* was *5 here */, 34 / 2, MOD_HC);
-
-		// Call recoil for player. 300 vertical, 100 horizontal. -JukS-
-		Weapon_Recoil(ent, 300, 100);
+		Weapon_Recoil(ent, 150, 150);  // Add some recoil... -JukS-
 
 		ent->client->cannon_rds -= 2;
 	}
@@ -3153,7 +3152,7 @@ void Sniper_Fire (edict_t * ent)
 	//If no reload, fire normally.
 	fire_bullet_sniper (ent, start, forward, damage, kick, spread, spread, MOD_SNIPER);
 	Stats_AddShot(ent, MOD_SNIPER);
-
+	Weapon_Recoil(ent, 30, 30);  // Add some recoil... -JukS-
 	ent->client->sniper_rds--;
 	ent->client->ps.fov = 90;	// so we can watch the next round get chambered
 	ent->client->ps.gunindex =

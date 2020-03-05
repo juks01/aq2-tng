@@ -232,7 +232,12 @@ qboolean Pickup_Powerup (edict_t * ent, edict_t * other)
 void AddItem(edict_t *ent, gitem_t *item)
 {
 	ent->client->inventory[ITEM_INDEX (item)]++;
-	ent->client->unique_item_total++;
+	if (item->typeNum != SIL_NUM) // Don't count silencer as spec item -JukS-
+	{
+		ent->client->unique_item_total++;
+	}
+//	gi.dprintf("SpecItems: %d\n", ent->client->unique_item_total); // for debugging...
+
 	if (item->typeNum == LASER_NUM)
 	{
 		SP_LaserSight(ent, item);	//ent->item->use(other, ent->item);
@@ -323,8 +328,8 @@ qboolean Pickup_ItemPack (edict_t * ent, edict_t * other)
 //zucc pickup function for special items
 qboolean Pickup_Special (edict_t * ent, edict_t * other)
 {
-	if (other->client->unique_item_total >= unique_items->value)
-		return false;
+	if ((other->client->unique_item_total >= unique_items->value) && ent->typeNum != SIL_NUM)
+		return false; // Don't count silencer as spec item. Added &&... -JukS- ^^^
 
 	// Don't allow picking up multiple of the same special item.
 	if( (! allow_hoarding->value) && other->client->inventory[ITEM_INDEX(ent->item)] )
@@ -345,7 +350,12 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 {
 	int count;
 
-	ent->client->unique_item_total--;
+	if (item->typeNum != SIL_NUM) // Don't count silencer as spec item -JukS-
+	{
+		ent->client->unique_item_total--;
+	}
+//	gi.dprintf("SpecItems: %d\n", ent->client->unique_item_total); // for debugging...
+
 	if (item->typeNum == BAND_NUM && INV_AMMO(ent, BAND_NUM) <= 1)
 	{
 		if (gameSettings & GS_DEATHMATCH)
