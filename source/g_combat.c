@@ -500,14 +500,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			else if (dist > 600.0)
 				damage = (int)(damage * 2 / 3);
 			//Fallthrough
-		case MOD_MP5:
-			// damage reduction for longer range MP5 shots	-- Copied by JukS
-			dist = Distance(targ->s.origin, inflictor->s.origin);
-			if (dist > 3000.0)
-				damage = (int)(damage * 1 / 2);
-			else if (dist > 2000.0)
-				damage = (int)(damage * 2 / 3);
-			//Fallthrough
+		case MOD_MP5: // removed my created MP5 distance damage decreament as unnecessary -JukS-
 		case MOD_M4:
 		case MOD_SNIPER:
 		case MOD_KNIFE:
@@ -606,11 +599,48 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					do_sparks = 1;
 				}
 			}
-			else if (z_rel < LEG_DAMAGE)
-			{
-				// If legdmg with slippers -JukS-
-				if ((INV_AMMO(targ, GREAVES_NUM) && mod != MOD_KNIFE
-					&& mod != MOD_KNIFE_THROWN && mod != MOD_SNIPER))
+			else if (z_rel < LEG_DAMAGE) // IF LEGS ARE HIT
+			{ // Regenerated using head damage as template -JukS-
+				damage_type = LOC_LDAM;
+				if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN) //Knife doesnt care about greaves
+					gotArmor = INV_AMMO(targ, GREAVES_NUM);
+
+				if (attacker->client)
+				{
+					strcpy(attacker->client->last_damaged_players, client->pers.netname);
+					Stats_AddHit(attacker, mod, (gotArmor) ? LOC_GREAVES : LOC_LDAM);
+				}
+
+				if (!gotArmor)
+				{
+					damage = damage * .25;
+					if (attacker->client)
+					{
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n",
+							client->pers.netname);
+					}
+
+					gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
+					targ->client->leg_damage = 1;
+					targ->client->leghits++;
+				}
+				else if (mod == MOD_SNIPER)
+				{
+					if (attacker->client)
+					{
+						gi.cprintf(attacker, PRINT_HIGH, "%s has Greaves, too bad you have AP rounds...\n",
+							targ->client->pers.netname);
+						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
+							attacker->client->pers.netname);
+					}
+					damage = damage * .285; // Decreased (.325 to .285) by JukS
+					damage_type = LOC_GREAVES;
+					bleeding = 1;
+					instant_dam = 0;
+					stopAP = 0;
+					do_sparks = 1;
+				}
+				else
 				{
 					if (attacker->client)
 					{
@@ -628,39 +658,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					stopAP = 1;
 					do_sparks = 1;
 				}
-				else if ((INV_AMMO(targ, GREAVES_NUM) && mod == MOD_SNIPER))
-				{
-					if (attacker->client)
-					{
-						gi.cprintf(attacker, PRINT_HIGH, "%s has Greaves, too bad you have AP rounds...\n",
-							targ->client->pers.netname);
-						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
-							attacker->client->pers.netname);
-					}
-					damage = damage * .285; // Decreased (.325 to .285) by JukS
-					damage_type = LOC_GREAVES;
-					bleeding = 1;
-					instant_dam = 0;
-					stopAP = 0;
-					do_sparks = 1;
-				}
-				// end of If legdmg with slippers -JukS- (1.2.2020)
-				else
-				{
-					damage_type = LOC_LDAM;
-					damage = damage * .25;
-					if (attacker->client)
-					{
-						strcpy(attacker->client->last_damaged_players, client->pers.netname);
-						Stats_AddHit(attacker, mod, LOC_LDAM);
-						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n",
-							client->pers.netname);
-					}
 
-					gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
-					targ->client->leg_damage = 1;
-					targ->client->leghits++;
-				}
 			}
 			else if (z_rel < STOMACH_DAMAGE)
 			{

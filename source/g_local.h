@@ -915,8 +915,8 @@ extern int sm_meat_index;
 #define LOC_KVLR_HELMET 5	// kevlar helmet	Freud, for %D
 #define LOC_KVLR_VEST	6	// kevlar vest 		Freud, for %D
 #define LOC_NO			7	// Shot by shotgun or handcannon
-#define LOC_GREAVES		9	// kevlar greaves	Added by JukS (1.2.2020)
-#define LOC_MAX			9
+#define LOC_GREAVES		8	// kevlar greaves	Added by JukS (1.2.2020)
+#define LOC_MAX			8
 
 extern int meansOfDeath;
 // zucc for hitlocation of death
