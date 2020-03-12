@@ -538,6 +538,8 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				{
 					strcpy( attacker->client->last_damaged_players, client->pers.netname );
 					Stats_AddHit( attacker, mod, (gotArmor) ? LOC_KVLR_HELMET : LOC_HDAM );
+					// Adding one meat gib from headshot - JukS-
+					ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 
 					//AQ2:TNG END
 					if (!friendlyFire && !in_warmup)

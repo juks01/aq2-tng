@@ -81,7 +81,7 @@
 
 
 void knife_touch(edict_t* ent, edict_t* other, cplane_t* plane, csurface_t* surf);
-void Zylon_Grenade (edict_t *ent);
+// void Zylon_Grenade (edict_t *ent); // Removed as unused -JukS-
 void setFFState (edict_t *ent);
 
 
@@ -1044,7 +1044,7 @@ void knife_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 	vec3_t move_angles;
 	gitem_t *item;
 
-
+	
 	if (other == ent->owner)
 		return;
 

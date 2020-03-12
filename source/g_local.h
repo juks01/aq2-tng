@@ -916,7 +916,7 @@ extern int sm_meat_index;
 #define LOC_KVLR_VEST	6	// kevlar vest 		Freud, for %D
 #define LOC_NO			7	// Shot by shotgun or handcannon
 #define LOC_GREAVES		8	// kevlar greaves	Added by JukS (1.2.2020)
-#define LOC_MAX			8
+#define LOC_MAX			9	// Increased to 9 to get Greaves stats work -JukS-
 
 extern int meansOfDeath;
 // zucc for hitlocation of death
