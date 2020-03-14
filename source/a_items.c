@@ -118,6 +118,17 @@ void SpawnSpecs(edict_t * ent)
 			// gi.dprintf("Spawning special item '%s'.\n", GET_ITEM(itemNum)->pickup_name); // Modified by JukS
 			SpawnSpec(spec, spot);
 		}
+
+	}
+
+	// Added new weapon (SOCOM) to be spawned with items in Deathmatch -JukS-
+	// This makes it happen only at first spawn
+	if (!ITF_ALLOWED(MK23MIL_NUM))
+	{
+		if ((spec = GET_ITEM(MK23MIL_NUM)) != NULL && (spot = FindSpecSpawn()) != NULL) {
+			gi.dprintf("Spawning SOCOM with items...\n");
+			SpawnSpec(spec, spot);
+		}
 	}
 }
 

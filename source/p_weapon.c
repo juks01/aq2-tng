@@ -969,7 +969,7 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 			replacement = GET_ITEM(MK23_NUM);	// back to the pistol then
 			ent->client->newweapon = replacement;
 			ent->client->weaponstate = WEAPON_DROPPING;
-			ent->client->ps.gunframe = 40; // TODO: This should be...? -JukS-
+			ent->client->ps.gunframe = 40;
 		}
 		ent->client->unique_weapon_total--;	// dropping 1 unique weapon
 		temp = Drop_Item(ent, item);

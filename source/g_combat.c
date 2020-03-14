@@ -538,8 +538,6 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				{
 					strcpy( attacker->client->last_damaged_players, client->pers.netname );
 					Stats_AddHit( attacker, mod, (gotArmor) ? LOC_KVLR_HELMET : LOC_HDAM );
-					// Adding one meat gib from headshot - JukS-
-					ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 
 					//AQ2:TNG END
 					if (!friendlyFire && !in_warmup)
@@ -567,8 +565,11 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					if (attacker->client)
 						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the head\n", client->pers.netname);
 
-					if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN)
+					if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN) {
+						// Adding one meat gib from headshot - JukS-
+						ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 						gi.sound(targ, CHAN_VOICE, level.snd_headshot, 1, ATTN_NORM, 0);
+					}
 				}
 				else if (mod == MOD_SNIPER)
 				{
