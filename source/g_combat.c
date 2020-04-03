@@ -958,7 +958,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			targ->client->bleedloc_offset[1] = DotProduct( offset, right );
 			targ->client->bleedloc_offset[2] = DotProduct( offset, up );
 			
-			client->bleeddelay = level.framenum + 2 * HZ;  // 2 seconds
+			client->bleeddelay = level.framenum + 0.5 * HZ;  // 2 seconds --> 0.5secs (by JukS)
 		}
 		if (attacker->client)
 		{

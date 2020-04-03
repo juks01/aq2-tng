@@ -1129,7 +1129,7 @@ void Do_Bleeding (edict_t * ent)
 		return;
 
 	if (!(ent->client->bleeding) || (ent->health <= 0))
-		return;
+			return;
 
 	temp = (int) (ent->client->bleeding * .2);
 	ent->client->bleeding -= temp;
@@ -1157,7 +1157,7 @@ void Do_Bleeding (edict_t * ent)
 		}
 		if (ent->client->bleeddelay <= level.framenum)
 		{
-			ent->client->bleeddelay = level.framenum + 2 * HZ;  // 2 seconds
+			ent->client->bleeddelay = level.framenum + 0.5 * HZ;  // 2 seconds --> 0.5 by JukS
 			
 			vec3_t fwd, right, up, pos, vel;
 			AngleVectors( ent->s.angles, fwd, right, up );
