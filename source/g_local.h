@@ -414,6 +414,7 @@ typedef enum
 {
   AMMO_BULLETS,
   AMMO_SHELLS,
+  AMMO_SHELLS2,
   AMMO_ROCKETS,
   AMMO_GRENADES,
   AMMO_CELLS,
@@ -558,6 +559,7 @@ bind 6 "use Sniper Rifle"
 #define KNIFE_NAME   "Combat Knife"
 #define GRENADE_NAME "M26 Fragmentation Grenade"
 #define MK23MIL_NAME "USSOCOM MK23 Pistol" // added by JukS (2.2.2020)
+#define AA12_NAME	 "Auto Assault-12 Shotgun" // added by JukS ( 4.4.2020)
 
 #define SIL_NAME     "Silencer"
 #define SLIP_NAME    "Stealth Slippers"
@@ -578,32 +580,34 @@ bind 6 "use Sniper Rifle"
 #define DUAL_NUM				7 // 64
 #define KNIFE_NUM				8 // 128
 #define MK23MIL_NUM				9 // 256 - added by JukS (2.2.2020)
-#define GRENADE_NUM				10 // 512
+#define AA12_NUM				10 // 512 - added by JukS ( 4.4.2020)
+#define GRENADE_NUM				11 // 1024
 
-#define SIL_NUM					11 // 1 (itm_flags)
-#define SLIP_NUM				12 // 2
-#define BAND_NUM				13 // 4
-#define KEV_NUM					14 // 8
-#define LASER_NUM				15 // 16
-#define HELM_NUM				16 // 32
-#define GREAVES_NUM				17 // 64 - added by JukS (2.2.2020)
+#define SIL_NUM					12 // 1 (itm_flags)
+#define SLIP_NUM				13 // 2
+#define BAND_NUM				14 // 4
+#define KEV_NUM					15 // 8
+#define LASER_NUM				16 // 16
+#define HELM_NUM				17 // 32
+#define GREAVES_NUM				18 // 64 - added by JukS (2.2.2020)
 
-#define MK23_ANUM				18
-#define MP5_ANUM				19
-#define M4_ANUM					20
-#define SHELL_ANUM				21
-#define SNIPER_ANUM				22
+#define MK23_ANUM				19
+#define MP5_ANUM				20
+#define M4_ANUM					21
+#define AA12_ANUM				22 // Added by JukS  4.4.2020
+#define SHELL_ANUM				23
+#define SNIPER_ANUM				24
 
-#define FLAG_T1_NUM				23
-#define FLAG_T2_NUM				24
+#define FLAG_T1_NUM				25
+#define FLAG_T2_NUM				26
 
-#define GRAPPLE_NUM				25
+#define GRAPPLE_NUM				27
 
-#define ITEM_MAX_NUM			25
+#define ITEM_MAX_NUM			27
 
-#define WEAPON_COUNT			10
+#define WEAPON_COUNT			11
 #define ITEM_COUNT				7
-#define AMMO_COUNT				5
+#define AMMO_COUNT				6
 #define WEAPON_FIRST			1
 #define WEAPON_MAX				WEAPON_FIRST+WEAPON_COUNT
 #define ITEM_FIRST				WEAPON_MAX
@@ -875,35 +879,36 @@ extern int sm_meat_index;
 #define MOD_KNIFE                       8
 #define MOD_KNIFE_THROWN                9
 #define MOD_MK23MIL                     10 // Added by JukS (15.2.2020)
-#define MOD_GRENADE                     11
-#define MOD_G_SPLASH                    12
-#define MOD_HANDGRENADE                 13
-#define MOD_HG_SPLASH                   14
-#define MOD_PUNCH                       15
-#define MOD_BLASTER                     16
-#define MOD_HYPERBLASTER                17
-#define MOD_WATER                       18
-#define MOD_SLIME                       19
-#define MOD_LAVA                        20
-#define MOD_CRUSH                       21
-#define MOD_TELEFRAG                    22
-#define MOD_FALLING                     23
-#define MOD_SUICIDE                     24
-#define MOD_HELD_GRENADE                25
-#define MOD_EXPLOSIVE                   26
-#define MOD_BARREL                      27
-#define MOD_BOMB                        28
-#define MOD_EXIT                        29
-#define MOD_SPLASH                      30
-#define MOD_TARGET_LASER                31
-#define MOD_TRIGGER_HURT                32
-#define MOD_HIT                         33
-#define MOD_TARGET_BLASTER              34
+#define MOD_AA12                        11 // Added by JukS ( 4.4.2020)
+#define MOD_GRENADE                     12
+#define MOD_G_SPLASH                    13
+#define MOD_HANDGRENADE                 14
+#define MOD_HG_SPLASH                   15
+#define MOD_PUNCH                       16
+#define MOD_BLASTER                     17
+#define MOD_HYPERBLASTER                18
+#define MOD_WATER                       19
+#define MOD_SLIME                       20
+#define MOD_LAVA                        21
+#define MOD_CRUSH                       22
+#define MOD_TELEFRAG                    23
+#define MOD_FALLING                     24
+#define MOD_SUICIDE                     25
+#define MOD_HELD_GRENADE                26
+#define MOD_EXPLOSIVE                   27
+#define MOD_BARREL                      28
+#define MOD_BOMB                        29
+#define MOD_EXIT                        30
+#define MOD_SPLASH                      31
+#define MOD_TARGET_LASER                32
+#define MOD_TRIGGER_HURT                33
+#define MOD_HIT                         34
+#define MOD_TARGET_BLASTER              35
 //zucc
-#define MOD_BLEEDING                    35
-#define MOD_KICK                        36
-#define MOD_GRAPPLE						37
-#define MOD_TOTAL						38
+#define MOD_BLEEDING                    36
+#define MOD_KICK                        37
+#define MOD_GRAPPLE						38
+#define MOD_TOTAL						39
 #define MOD_FRIENDLY_FIRE               0x8000000
 
 
@@ -1613,6 +1618,7 @@ struct gclient_s
 	int			max_shells;
 	int			max_mp5mags;
 	int			max_m4mags;
+	int			max_shells2; // Added by JukS  4.4.2020
 	int			max_sniper_rnds;
 
 	int			mk23_max;
@@ -1630,6 +1636,8 @@ struct gclient_s
 	int			mp5_rds;
 	int			m4_max;
 	int			m4_rds;
+	int			aa12_max; // Added by JukS  4.4.2020
+	int			aa12_rds; // Added by JukS  4.4.2020
 	int			cannon_max;
 	int			cannon_rds;
 	int			knife_max;
@@ -1964,6 +1972,7 @@ void AddSplat (edict_t * self, vec3_t point, trace_t * tr);
 #define MK23_AMMO_NAME    "Pistol Magazine"
 #define MP5_AMMO_NAME     "MP5 Magazine"
 #define M4_AMMO_NAME      "M4 Magazine"
+#define AA12_AMMO_NAME    "12 Gauge Slugs" // Added by JukS  4.4.2020
 #define SHOTGUN_AMMO_NAME "12 Gauge Shells"
 #define SNIPER_AMMO_NAME  "AP Sniper Ammo"
 

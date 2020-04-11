@@ -541,7 +541,7 @@ void SelectWeapon9(edict_t* ent, pmenu_t* p)
 	ent->client->pers.chosenWeapon = GET_ITEM(DUAL_NUM);
 	PMenu_Close(ent);
 	OpenItemMenu(ent);
-	unicastSound(ent, gi.soundindex("weapons/mk23slide.wav"), 1.0);
+	unicastSound(ent, gi.soundindex("weapons/cclose.wav"), 1.0);
 }
 
 // USSOCOM MK23 added by JukS (2.2.2020)
@@ -551,6 +551,15 @@ void SelectWeapon8(edict_t* ent, pmenu_t* p)
 	PMenu_Close(ent);
 	OpenItemMenu(ent);
 	unicastSound(ent, gi.soundindex("weapons/mk23slide.wav"), 1.0);
+}
+
+// AA-12 added by JukS ( 4.4.2020)
+void SelectWeapon10(edict_t* ent, pmenu_t* p)
+{
+	ent->client->pers.chosenWeapon = GET_ITEM(AA12_NUM);
+	PMenu_Close(ent);
+	OpenItemMenu(ent);
+	unicastSound(ent, gi.soundindex("weapons/m4a1slide.wav"), 1.0);
 }
 
 void SelectItem1(edict_t *ent, pmenu_t *p)
@@ -579,7 +588,7 @@ void SelectItem7(edict_t* ent, pmenu_t* p)
 {
 	ent->client->pers.chosenItem = GET_ITEM(GREAVES_NUM);
 	PMenu_Close(ent);
-	unicastSound(ent, gi.soundindex("misc/veston.wav"), 1.0); // TODO: Armor sound
+	unicastSound(ent, gi.soundindex("misc/greaves.wav"), 1.0);
 }
 
 void SelectItem4(edict_t *ent, pmenu_t *p)
@@ -694,6 +703,7 @@ pmenu_t weapmenu[] = {
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Combat Knives", SelectWeapon0
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Akimbo Pistols", SelectWeapon9
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "USSOCOM MK23", SelectWeapon31
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Auto Assault-12 Shotgun", SelectWeapon31
   //AQ2:TNG End adding wp_flags
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},
   //AQ2:TNG - Slicer: changing this
@@ -1097,6 +1107,7 @@ char *menu_itemnames[ITEM_MAX_NUM] = {
 	DUAL_NAME,
 	KNIFE_NAME,
 	MK23MIL_NAME,	// Added by JukS 11.2.2020
+	AA12_NAME,		// Added by JukS  4.4.2020
 	GRENADE_NAME,
 
 	SIL_NAME,
@@ -1167,7 +1178,9 @@ void OpenWeaponMenu (edict_t * ent)
 		{ M4_NUM, SelectWeapon6 },
 		{ KNIFE_NUM, SelectWeapon0 },
 		{ DUAL_NUM, SelectWeapon9 },
-		{ MK23MIL_NUM, SelectWeapon8 }
+		{ MK23MIL_NUM, SelectWeapon8 },	
+		// Added by JukS 
+		{ AA12_NUM, SelectWeapon10 }	// Added by JukS (11.4.2020)
 	};
 	int i, count, pos = 4;
 
@@ -1326,7 +1339,8 @@ void CleanLevel ()
 			case HC_NUM:
 			case SNIPER_NUM:
 			case DUAL_NUM:
-			case MK23MIL_NUM: // Added by JukS 11.2.2020
+			case MK23MIL_NUM:	// Added by JukS 11.2.2020
+			case AA12_NUM:		// Added by JukS  4.4.2020
 			case KNIFE_NUM:
 			case GRENADE_NUM:
 			case SIL_NUM:

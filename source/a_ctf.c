@@ -1296,13 +1296,15 @@ void CTFCapReward(edict_t * ent)
 			player_weapon = MP5_NUM;
 		if(ent->client->inventory[ITEM_INDEX(GET_ITEM(M4_NUM))])
 			player_weapon = M4_NUM;
-		if(ent->client->inventory[ITEM_INDEX(GET_ITEM(M3_NUM))])
+		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(AA12_NUM))]) // Added by JukS ( 4.4.2020)
+			player_weapon = AA12_NUM;
+		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(M3_NUM))])
 			player_weapon = M3_NUM;
 		if(ent->client->inventory[ITEM_INDEX(GET_ITEM(HC_NUM))])
 			player_weapon = HC_NUM;
 		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(SNIPER_NUM))])
 			player_weapon = SNIPER_NUM;
-		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(MK23MIL_NUM))])
+		if (ent->client->inventory[ITEM_INDEX(GET_ITEM(MK23MIL_NUM))]) // Added by JukS
 			player_weapon = MK23MIL_NUM;
 	}
 
@@ -1319,14 +1321,24 @@ void CTFCapReward(edict_t * ent)
 		client->mp5_rds = client->mp5_max;
 	}
 	else if (player_weapon == M4_NUM) {
-		if(client->unique_weapon_total < 1) {
+		if (client->unique_weapon_total < 1) {
 			item = GET_ITEM(M4_NUM);
 			client->inventory[ITEM_INDEX(item)] = 1;
 			client->unique_weapon_total = 1;
 		}
 		item = GET_ITEM(M4_ANUM);
-		client->inventory[ITEM_INDEX(item)] = 1*band;
+		client->inventory[ITEM_INDEX(item)] = 1 * band;
 		client->m4_rds = client->m4_max;
+	}
+	else if (player_weapon == AA12_NUM) { // Added by JukS ( 4.4.2020)
+		if (client->unique_weapon_total < 1) {
+			item = GET_ITEM(AA12_NUM);
+			client->inventory[ITEM_INDEX(item)] = 1;
+			client->unique_weapon_total = 1;
+		}
+		item = GET_ITEM(AA12_ANUM);
+		client->inventory[ITEM_INDEX(item)] = 1 * band;
+		client->aa12_rds = client->aa12_max;
 	}
 	else if (player_weapon == M3_NUM) {
 		if(client->unique_weapon_total < 1) {

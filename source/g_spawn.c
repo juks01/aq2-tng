@@ -466,7 +466,7 @@ static char *sp_item[ITEM_SWITCH_COUNT][2] = {
   {"ammo_shells", "ammo_m3"},
   {"ammo_grenades", "weapon_Grenade"}
   ,
-  {"ammo_box", "ammo_m3"},
+  {"ammo_box", "ammo_aa12"}, // changed from ammo_m3 to ammo_aa12 by JukS  4.4.2020
   {"weapon_cannon", "weapon_HC"},
   {"weapon_sniper", "weapon_Sniper"}
 
@@ -1409,7 +1409,7 @@ Only used for the world.
 
 void SP_worldspawn (edict_t * ent)
 {
-	int i, bullets, shells;
+	int i, bullets, shells, shells2;
 	char *picname;
 
 	ent->movetype = MOVETYPE_PUSH;
@@ -1473,9 +1473,11 @@ void SP_worldspawn (edict_t * ent)
 
 	bullets = gi.imageindex("a_bullets");
 	shells = gi.imageindex("a_shells");
+	shells2 = gi.imageindex("a_shells2"); // Added by JukS (11.4.2020)
 	level.pic_weapon_ammo[MK23_NUM] = bullets;
 	level.pic_weapon_ammo[MP5_NUM] = bullets;
 	level.pic_weapon_ammo[M4_NUM] = bullets;
+	level.pic_weapon_ammo[AA12_NUM] = shells2; // Added by JukS (11.4.2020)
 	level.pic_weapon_ammo[M3_NUM] = shells;
 	level.pic_weapon_ammo[HC_NUM] = shells;
 	level.pic_weapon_ammo[SNIPER_NUM] = bullets;

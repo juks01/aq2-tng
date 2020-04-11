@@ -701,14 +701,22 @@ void EjectShell(edict_t * self, vec3_t start, int toggle)
 		VectorMA(start, left ? -7 : .4, right, start);
 		VectorMA(start, left ? 5 : 2, forward, start);
 		VectorMA(start, left ? -10 : -8, up, start);
-	} else if (self->client->curr_weap == M4_NUM) {
+	}
+	else if (self->client->curr_weap == M4_NUM) {
 		VectorMA(start, left ? -10 : 5, right, start);
 		VectorMA(start, left ? 6 : 12, forward, start);
 		VectorMA(start, left ? -9 : -11, up, start);
-	} else if (self->client->curr_weap == MP5_NUM) {
+	}
+	else if (self->client->curr_weap == AA12_NUM) { // Added by JukS ( 4.4.2020)
+		VectorMA(start, left ? -10 : 5, right, start);
+		VectorMA(start, left ? 6 : 12, forward, start);
+		VectorMA(start, left ? -9 : -11, up, start);
+	}
+	else if (self->client->curr_weap == MP5_NUM) {
 		VectorMA(start, left ? -10 : 6, right, start);
 		VectorMA(start, left ? 6 : 8, forward, start);
 		VectorMA(start, left ? -9 : -10, up, start);
+
 	} else if (self->client->curr_weap == SNIPER_NUM) {
 		VectorMA(start, fix * 11, right, start);
 		VectorMA(start, 2, forward, start);
@@ -1162,8 +1170,14 @@ void GetAmmo( edict_t *ent, char *buf )
 				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
 			return;
 		case M4_NUM:
-			sprintf( buf, "%d round%s (%d extra mag%s)",
+			sprintf(buf, "%d round%s (%d extra mag%s)",
 				ent->client->m4_rds, ent->client->m4_rds == 1 ? "" : "s",
+				ent->client->inventory[ent->client->ammo_index],
+				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
+			return;
+		case AA12_NUM: // Added by JukS ( 4.4.2020)
+			sprintf(buf, "%d round%s (%d extra mag%s)",
+				ent->client->aa12_rds, ent->client->aa12_rds == 1 ? "" : "s",
 				ent->client->inventory[ent->client->ammo_index],
 				ent->client->inventory[ent->client->ammo_index] == 1 ? "" : "s");
 			return;

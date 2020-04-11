@@ -321,6 +321,9 @@ void spray_blood(edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 	case MOD_MK23MIL: // Added by JukS 11.2.2020
 		speed = 2200;
 		break;
+	case MOD_AA12: // Added by JukS 11.2.2020
+		speed = 4000;
+		break;
 	default:
 		speed = 1800;
 		break;
@@ -492,6 +495,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		switch (mod) {
 		case MOD_MK23:
 		case MOD_DUAL:
+		case MOD_AA12: // Added by JukS ( 4.4.2020)
 		case MOD_MK23MIL: // Added by JukS
 			// damage reduction for longer range pistol shots
 			dist = Distance( targ->s.origin, inflictor->s.origin );

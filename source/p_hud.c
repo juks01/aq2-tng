@@ -429,6 +429,10 @@ void G_SetStats (edict_t * ent)
 				ent->client->ps.stats[STAT_AMMO_ICON] = level.pic_weapon_ammo[ent->client->curr_weap];
 				ent->client->ps.stats[STAT_AMMO] = ent->client->m4_rds;
 				break;
+			case AA12_NUM:
+				ent->client->ps.stats[STAT_AMMO_ICON] = level.pic_weapon_ammo[ent->client->curr_weap];
+				ent->client->ps.stats[STAT_AMMO] = ent->client->aa12_rds;
+				break;
 			case M3_NUM:
 				ent->client->ps.stats[STAT_AMMO_ICON] = level.pic_weapon_ammo[ent->client->curr_weap];
 				ent->client->ps.stats[STAT_AMMO] = ent->client->shot_rds;

@@ -748,7 +748,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	//Grenade_Explode(ent);
 
 	// New stuff: Make some damage if grenade hits to someone -JukS-
-	// Grenade velocities by Throw type around: Long(950), Medium(740), Short(460)
+	// Grenade velocities by Throw type around: Long(920), Medium(720), Short(400)
 	float grenSpeed = VectorNormalize(ent->velocity);
 	if (grenSpeed > 500) // Don't make damage with slow speeds
 	{

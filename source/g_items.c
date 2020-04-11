@@ -80,7 +80,8 @@ void Drop_Weapon (edict_t * ent, gitem_t * inv);
 // zucc
 void Weapon_MK23 (edict_t * ent);
 void Weapon_MP5 (edict_t * ent);
-void Weapon_M4 (edict_t * ent);
+void Weapon_M4(edict_t* ent);
+void Weapon_AA12(edict_t* ent); // Added by JukS  4.4.2020
 void Weapon_M3 (edict_t * ent);
 void Weapon_HC (edict_t * ent);
 void Weapon_Sniper (edict_t * ent);
@@ -251,6 +252,8 @@ void AddItem(edict_t *ent, gitem_t *item)
 			ent->client->max_shells = 28;
 		if (ent->client->max_m4mags < 2)
 			ent->client->max_m4mags = 2;
+		if (ent->client->max_shells2 < 2) // Added by JukS  4.4.2020
+			ent->client->max_shells2 = 2;
 		if (ent->client->max_sniper_rnds < 40)
 			ent->client->max_sniper_rnds = 40;
 		if (ent->client->max_mp5mags < 4)
@@ -382,6 +385,10 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 		ent->client->max_m4mags = 1;
 		if (INV_AMMO(ent, M4_ANUM) > 1)
 			INV_AMMO(ent, M4_ANUM) = 1;
+
+		ent->client->max_shells = 1;
+		if (INV_AMMO(ent, AA12_ANUM) > 1)
+			INV_AMMO(ent, AA12_ANUM) = 1;
 
 		ent->client->grenade_max = 2;
 		if (use_buggy_bandolier->value == 0) {
@@ -710,6 +717,10 @@ qboolean Add_Ammo (edict_t * ent, gitem_t * item, int count)
 	case M4_ANUM:
 		if (WPF_ALLOWED(item->typeNum))
 			max = ent->client->max_m4mags;
+		break;
+	case AA12_ANUM: // Added by JukS  4.4.2020
+		if (WPF_ALLOWED(item->typeNum))
+			max = ent->client->max_shells2;
 		break;
 	case SNIPER_ANUM:
 		if (WPF_ALLOWED(item->typeNum))
@@ -1410,7 +1421,29 @@ world_model_flags int               copied to 'ent->s.effects' (see s.effects fo
    NULL,
    0,
    "weapons/m4a1fire.wav weapons/m4a1in.wav weapons/m4a1out.wav weapons/m4a1slide.wav weapons/rocklf1a.wav weapons/rocklr1b.wav",
-  M4_NUM}
+  M4_NUM
+  }
+  , { // Added by JukS  4.4.2020
+   "weapon_AA12",
+   Pickup_Weapon,
+   Use_Weapon,
+   Drop_Weapon,
+   Weapon_AA12,
+   //"misc/w_pkup.wav",
+   NULL,
+   "models/weapons/g_aa12/tris.md2", // TODO: New model here!
+   0,
+   "models/weapons/v_aa12/tris.md2", // TODO: New model here!
+   "w_aa12",
+   AA12_NAME,
+   0,
+   0,
+   AA12_AMMO_NAME,
+   IT_WEAPON,
+   NULL,
+   0,
+   "weapons/shotgf1b.wav weapons/m4a1in.wav weapons/m4a1out.wav weapons/m4a1slide.wav weapons/rocklf1a.wav weapons/rocklr1b.wav",
+  AA12_NUM }
   ,
   {
    "weapon_M3",
@@ -1666,6 +1699,28 @@ always owned, never in the world^M
    }
   ,
   {
+   "ammo_aa12",
+   Pickup_Ammo,
+   NULL,
+   Drop_Ammo,
+   NULL,
+   //"misc/click.wav",
+   NULL,
+   "models/items/ammo/shells/medium/tris.md2", 1, // TODO: New model
+   NULL,
+   /* icon */ "a_shells2",
+   /* pickup */ AA12_AMMO_NAME,
+   /* width */ 3,
+		7,
+		NULL,
+		IT_AMMO,
+		NULL,
+		AMMO_SHELLS2,
+		/* precache */ "",
+		AA12_ANUM
+  }
+, 
+   {
    "ammo_sniper",
    Pickup_Ammo,
    NULL,
@@ -2242,6 +2297,7 @@ void InitItems (void)
 	items[MK23_ANUM].flag = items[MK23_NUM].flag | items[DUAL_NUM].flag | items[MK23MIL_NUM].flag; // Added MK23MIL by JukS
 	items[MP5_ANUM].flag = items[MP5_NUM].flag;
 	items[M4_ANUM].flag = items[M4_NUM].flag;
+	items[AA12_ANUM].flag = items[AA12_NUM].flag; // Added by JukS  4.4.2020
 	items[SHELL_ANUM].flag = items[M3_NUM].flag | items[HC_NUM].flag;
 	items[SNIPER_ANUM].flag = items[SNIPER_NUM].flag;
 }

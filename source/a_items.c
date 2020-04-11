@@ -121,12 +121,21 @@ void SpawnSpecs(edict_t * ent)
 
 	}
 
+	// Added new weapon (AA-12) to be spawned with items in Deathmatch -JukS- ( 4.4.2020)
+	// This makes it happen only at first spawn
+	if (!ITF_ALLOWED(AA12_NUM))
+	{
+		if ((spec = GET_ITEM(AA12_NUM)) != NULL && (spot = FindSpecSpawn()) != NULL) {
+			gi.dprintf("Spawning AA-12 with items...\n"); // TODO: Remove debug text
+			SpawnSpec(spec, spot);
+		}
+	}
 	// Added new weapon (SOCOM) to be spawned with items in Deathmatch -JukS-
 	// This makes it happen only at first spawn
 	if (!ITF_ALLOWED(MK23MIL_NUM))
 	{
 		if ((spec = GET_ITEM(MK23MIL_NUM)) != NULL && (spot = FindSpecSpawn()) != NULL) {
-			gi.dprintf("Spawning SOCOM with items...\n");
+			gi.dprintf("Spawning SOCOM with items...\n"); // TODO: Remove debug text
 			SpawnSpec(spec, spot);
 		}
 	}

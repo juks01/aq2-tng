@@ -378,7 +378,15 @@ void Cmd_Reload_f(edict_t * ent)
 	case M4_NUM:
 		if (ent->client->m4_rds == ent->client->m4_max)
 			return;
-		if(ent->client->inventory[ent->client->ammo_index] <= 0) {
+		if (ent->client->inventory[ent->client->ammo_index] <= 0) {
+			gi.cprintf(ent, PRINT_HIGH, "Out of ammo\n");
+			return;
+		}
+		break;
+	case AA12_NUM: // Added by JukS ( 4.4.2020)
+		if (ent->client->aa12_rds == ent->client->aa12_max)
+			return;
+		if (ent->client->inventory[ent->client->ammo_index] <= 0) {
 			gi.cprintf(ent, PRINT_HIGH, "Out of ammo\n");
 			return;
 		}
@@ -932,6 +940,8 @@ int GetWeaponNumFromArg(const char *s)
 		itemNum = SNIPER_NUM;
 	else if (!Q_stricmp(s, "m4"))
 		itemNum = M4_NUM;
+	else if (!Q_stricmp(s, "aa12"))  // Added by JukS  4.4.2020
+		itemNum = AA12_NUM;
 	else if (!Q_stricmp(s, "socom")) // Added by JukS 11.2.2020
 		itemNum = MK23MIL_NUM;
 
@@ -994,6 +1004,7 @@ void Cmd_Choose_f(edict_t * ent)
 	case SNIPER_NUM:
 	case KNIFE_NUM:
 	case M4_NUM:
+	case AA12_NUM:	  // Added by JukS  4.4.2020
 	case MK23MIL_NUM: // Added by JukS 11.2.2020
 		if (!WPF_ALLOWED(itemNum)) {
 			gi.cprintf(ent, PRINT_HIGH, "Weapon disabled on this server.\n");

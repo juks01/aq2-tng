@@ -276,7 +276,7 @@ qboolean Pickup_Weapon (edict_t * ent, edict_t * other)
 	case M4_NUM:
 		if (other->client->unique_weapon_total >= unique_weapons->value + band)
 			return false;		// we can't get it
-		if ((! allow_hoarding->value) && other->client->inventory[index])
+		if ((!allow_hoarding->value) && other->client->inventory[index])
 			return false;		// we already have one
 
 		other->client->inventory[index]++;
@@ -285,7 +285,22 @@ qboolean Pickup_Weapon (edict_t * ent, edict_t * other)
 			other->client->m4_rds = other->client->m4_max;
 		}
 		special = 1;
-		gi.cprintf (other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);   
+		gi.cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
+		break;
+
+	case AA12_NUM: // Added by JukS (4.4.2020)
+		if (other->client->unique_weapon_total >= unique_weapons->value + band)
+			return false;		// we can't get it
+		if ((!allow_hoarding->value) && other->client->inventory[index])
+			return false;		// we already have one
+
+		other->client->inventory[index]++;
+		other->client->unique_weapon_total++;
+		if (!(ent->spawnflags & DROPPED_ITEM)) {
+			other->client->aa12_rds = other->client->aa12_max;
+		}
+		special = 1;
+		gi.cprintf(other, PRINT_HIGH, "%s - Unique Weapon\n", ent->item->pickup_name);
 		break;
 
 	case M3_NUM:
@@ -840,7 +855,24 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 			//ChangeWeapon( ent );
 		}
 		ent->client->unique_weapon_total--;	// dropping 1 unique weapon
-		temp = Drop_Item (ent, item);
+		temp = Drop_Item(ent, item);
+		temp->think = temp_think_specweap;
+		ent->client->inventory[index]--;
+	}
+	else if (item->typeNum == AA12_NUM)
+	{
+
+		if (ent->client->weapon == item && ent->client->inventory[index] == 1)
+		{
+			replacement = GET_ITEM(MK23_NUM);	// back to the pistol then
+			ent->client->newweapon = replacement;
+			ent->client->weaponstate = WEAPON_DROPPING;
+			ent->client->ps.gunframe = 44;
+
+			//ChangeWeapon( ent );
+		}
+		ent->client->unique_weapon_total--;	// dropping 1 unique weapon
+		temp = Drop_Item(ent, item);
 		temp->think = temp_think_specweap;
 		ent->client->inventory[index]--;
 	}
@@ -1022,6 +1054,8 @@ void DropSpecialWeapon (edict_t * ent)
 		Drop_Weapon (ent, GET_ITEM(MP5_NUM));
 	else if (INV_AMMO(ent, M4_NUM) > 0)
 		Drop_Weapon(ent, GET_ITEM(M4_NUM));
+	else if (INV_AMMO(ent, AA12_NUM) > 0)			// Added by JukS  4.4.2020 (drop special weap)
+		Drop_Weapon(ent, GET_ITEM(AA12_NUM));
 	else if (INV_AMMO(ent, MK23MIL_NUM) > 0)		// Added by JukS 11.2.2020 (drop special weap)
 		Drop_Weapon(ent, GET_ITEM(MK23MIL_NUM));
 	// special case, aq does this, guess I can support it
@@ -1056,6 +1090,8 @@ void DropExtraSpecial (edict_t * ent)
 		Drop_Weapon (ent, GET_ITEM(MP5_NUM));
 	else if (INV_AMMO(ent, M4_NUM) > 0 && M4_NUM != itemNum)
 		Drop_Weapon(ent, GET_ITEM(M4_NUM));
+	else if (INV_AMMO(ent, AA12_NUM) > 0 && AA12_NUM != itemNum)		// Added by JukS  4.4.2020 (drop extra spec weap)
+		Drop_Weapon(ent, GET_ITEM(AA12_NUM));
 	else if (INV_AMMO(ent, MK23MIL_NUM) > 0 && MK23MIL_NUM != itemNum)	// Added by JukS 11.2.2020 (drop extra spec weap)
 		Drop_Weapon(ent, GET_ITEM(MK23MIL_NUM));
 	else
@@ -1065,7 +1101,7 @@ void DropExtraSpecial (edict_t * ent)
 //zucc ready special weapon
 void ReadySpecialWeapon (edict_t * ent)
 {
-	int weapons[6] = { MP5_NUM, M4_NUM, M3_NUM, HC_NUM, SNIPER_NUM, MK23MIL_NUM }; // Modified by JukS 11.2.2020
+	int weapons[7] = { MP5_NUM, M4_NUM, AA12_NUM, M3_NUM, HC_NUM, SNIPER_NUM, MK23MIL_NUM }; // Modified by JukS 11.2.2020
 	int curr, i;
 	int last;
 
@@ -1074,26 +1110,26 @@ void ReadySpecialWeapon (edict_t * ent)
 		return;
 
 
-	for (curr = 0; curr < 6; curr++)
+	for (curr = 0; curr < 7; curr++)
 	{
 		if (ent->client->curr_weap == weapons[curr])
 			break;
 	}
-	if (curr >= 6)
+	if (curr >= 7)
 	{
 		curr = -1;
-		last = 6;
+		last = 7;
 	}
 	else
 	{
-		last = curr + 6;
+		last = curr + 7;
 	}
 
 	for (i = (curr + 1); i != last; i = (i + 1))
 	{
-		if (INV_AMMO(ent, weapons[i % 6]))
+		if (INV_AMMO(ent, weapons[i % 7]))
 		{
-			ent->client->newweapon = GET_ITEM(weapons[i % 6]);
+			ent->client->newweapon = GET_ITEM(weapons[i % 7]);
 			return;
 		}
 	}
@@ -1119,6 +1155,7 @@ A generic function to handle the basics of weapon thinking
 #define MK23MAG 12
 #define MP5MAG  30
 #define M4MAG   24
+#define AA12MAG 20 // Added by JukS  4.4.2020
 #define DUALMAG 24
 
 void
@@ -1198,17 +1235,29 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		break;
 	      }
 	    case M4_NUM:
-	      {
-		if (ent->client->ps.gunframe == 52)
-		  gi.sound (ent, CHAN_WEAPON,
-			    gi.soundindex ("weapons/m4a1out.wav"), 1,
-			    ATTN_NORM, 0);
-		else if (ent->client->ps.gunframe == 58)
-		  gi.sound (ent, CHAN_WEAPON,
-			    gi.soundindex ("weapons/m4a1in.wav"), 1,
-			    ATTN_NORM, 0);
-		break;
-	      }
+		{
+			if (ent->client->ps.gunframe == 52)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/m4a1out.wav"), 1,
+					ATTN_NORM, 0);
+			else if (ent->client->ps.gunframe == 58)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/m4a1in.wav"), 1,
+					ATTN_NORM, 0);
+			break;
+		}
+		case AA12_NUM: // Added by JukS  4.4.2020
+		{
+			if (ent->client->ps.gunframe == 52)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/m4a1out.wav"), 1,
+					ATTN_NORM, 0);
+			else if (ent->client->ps.gunframe == 58)
+				gi.sound(ent, CHAN_WEAPON,
+					gi.soundindex("weapons/m4a1in.wav"), 1,
+					ATTN_NORM, 0);
+			break;
+		}
 	    case M3_NUM:
 	      {
 		if (ent->client->shot_rds >= ent->client->shot_max)
@@ -1381,14 +1430,23 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		ent->client->machinegun_shots = 0;
 		break;
 	      }
-	    case M3_NUM:
-	      {
-		ent->client->shot_rds++;
-		(ent->client->inventory[ent->client->ammo_index])--;
-		if (ent->client->inventory[ent->client->ammo_index] < 0)
-		  {
-		    ent->client->inventory[ent->client->ammo_index] = 0;
-		  }
+	    case AA12_NUM: // Added by JukS  4.4.2020
+		{
+			ent->client->aa12_rds = ent->client->aa12_max;
+			(ent->client->inventory[ent->client->ammo_index])--;
+			if (ent->client->inventory[ent->client->ammo_index] < 0)
+			{
+				ent->client->inventory[ent->client->ammo_index] = 0;
+			}
+		}
+		case M3_NUM:
+		{
+			ent->client->shot_rds++;
+			(ent->client->inventory[ent->client->ammo_index])--;
+			if (ent->client->inventory[ent->client->ammo_index] < 0)
+			{
+				ent->client->inventory[ent->client->ammo_index] = 0;
+			}
 		break;
 	      }
 	    case HC_NUM:
@@ -1475,6 +1533,7 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		   ((ent->client->curr_weap == MK23_NUM) && (ent->client->mk23_rds > 0))
 		|| ((ent->client->curr_weap == MP5_NUM) && (ent->client->mp5_rds > 0))
 		|| ((ent->client->curr_weap == M4_NUM) && (ent->client->m4_rds > 0))
+		|| ((ent->client->curr_weap == AA12_NUM) && (ent->client->aa12_rds > 0)) // Added by JukS  4.4.2020
 		|| ((ent->client->curr_weap == M3_NUM) && (ent->client->shot_rds > 0))
 		|| ((ent->client->curr_weap == HC_NUM) && (ent->client->cannon_rds > 0))
 		|| ((ent->client->curr_weap == SNIPER_NUM) && (ent->client->sniper_rds > 0))
@@ -1603,6 +1662,13 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	    ent->client->machinegun_shots = 0;
 	    break;
 	  }
+	case AA12_NUM:
+	{
+		ent->client->fired = 0;	//reset any firing delays
+		ent->client->burst = 0;
+		ent->client->fast_reload = 0;
+		break;
+	}
 	case M3_NUM:
 	  {
 	    ent->client->fired = 0;	//reset any firing delays
@@ -1673,12 +1739,6 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	case MK23MIL_NUM: // Added by JukS 12.2.2020 (weap activate)
 	{
 		{
-/* Separate MIL from MK23 ammo -JukS-
-			if (ent->client->dual_rds >= ent->client->mk23mil_max)
-				ent->client->mk23mil_rds = ent->client->mk23mil_max;
-			else
-				ent->client->mk23mil_rds = ent->client->dual_rds;
-*/
 			if (ent->client->ps.gunframe == 3)	// 3
 			{
 				if (ent->client->mk23mil_rds > 0)
@@ -1916,7 +1976,15 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		  bOut = 1;
 		break;
 	      }
-	    case M3_NUM:
+		case AA12_NUM: // Added by JukS  4.4.2020
+		{
+			if (ent->client->aa12_rds > 0)
+				bFire = 1;
+			else
+				bOut = 1;
+			break;
+		}
+		case M3_NUM:
 	      {
 		if (ent->client->shot_rds > 0)
 		  {
@@ -2184,7 +2252,7 @@ GRENADE
 #define GRENADE_MINSPEED        400
 #define GRENADE_MAXSPEED        800
 
-void weapon_grenade_fire (edict_t * ent, qboolean held)
+void weapon_grenade_fire(edict_t* ent, qboolean held)
 {
 	vec3_t offset;
 	vec3_t forward, right;
@@ -2216,6 +2284,7 @@ void weapon_grenade_fire (edict_t * ent, qboolean held)
 #define MK23_SPREAD		140
 #define MP5_SPREAD		250 // DW: Changed this back to original from Edition's 240
 #define M4_SPREAD		300
+#define AA12_SPREAD		350 // Added by JukS  4.4.2020
 #define SNIPER_SPREAD	425
 #define DUAL_SPREAD		300 // DW: Changed this back to original from Edition's 275
 #define MK23MIL_SPREAD	120 // Added by JukS 11.2.2020
@@ -2306,7 +2375,7 @@ void PlayWeaponSound( edict_t *ent )
 		ent->client->weapon_sound &= ~MZ_BLASTER2;
 
 
-	if( ent->client->weapon_sound & MZ_SILENCED || ent->client->curr_weap == MK23MIL_NUM ) // Added MK23MIL to be forced
+	if( ent->client->weapon_sound & MZ_SILENCED || ent->client->curr_weap == MK23MIL_NUM ) // Added MK23MIL to be forced -JukS
 		// Silencer suppresses both sound and muzzle flash.
 		gi.sound( ent, CHAN_WEAPON, level.snd_silencer, 1, ATTN_NORM, 0 );
 
@@ -2926,6 +2995,105 @@ void Weapon_M3 (edict_t * ent)
   static int fire_frames[] = { 8, 9, 14, 0 };
 
   Weapon_Generic (ent, 7, 15, 35, 41, 52, 60, pause_frames, fire_frames, M3_Fire);
+}
+
+void AA12_Fire(edict_t* ent)
+{
+	int i;
+	vec3_t start;
+	vec3_t forward, right;
+	vec3_t angles;
+	int damage = 200;
+	int kick = 160;
+	vec3_t offset;
+	int spread = AA12_SPREAD;
+	int height = 0;
+	//If the user isn't pressing the attack button, advance the frame and go away....
+	if (!(ent->client->buttons & BUTTON_ATTACK))
+	{
+		ent->client->ps.gunframe++;
+		ent->client->machinegun_shots = 0;
+		return;
+	}
+
+// TODO? Wut? -JukS-
+	if (ent->client->ps.gunframe >= 64 && ent->client->ps.gunframe <= 69)
+	{
+		ent->client->ps.gunframe++;
+	}
+
+	//Oops! Out of ammo!
+	if (ent->client->aa12_rds < 1)
+	{
+		ent->client->ps.gunframe = 13;
+		if (level.framenum >= ent->pain_debounce_framenum)
+		{
+			gi.sound(ent, CHAN_VOICE, level.snd_noammo, 1, ATTN_NORM, 0);
+			ent->pain_debounce_framenum = level.framenum + 1 * HZ;
+		}
+		return;
+	}
+
+	// causes the ride up
+		ent->client->machinegun_shots++;
+		if (ent->client->machinegun_shots > ent->client->aa12_max)
+			ent->client->machinegun_shots = ent->client->aa12_max;
+
+	spread = AdjustSpread(ent, spread);
+
+	//Calculate the kick angles
+	for (i = 1; i < 3; i++)
+	{
+		ent->client->kick_origin[i] = crandom() * 0.25;
+		ent->client->kick_angles[i] = crandom() * 0.5;
+	}
+	ent->client->kick_origin[0] = crandom() * 0.35;
+	ent->client->kick_angles[0] = ent->client->machinegun_shots * -.7;
+
+	// get start / end positions
+	VectorAdd(ent->client->v_angle, ent->client->kick_angles, angles);
+	AngleVectors(angles, forward, right, NULL);
+	VectorSet(offset, 0, 8, ent->viewheight - height);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+
+	if (is_quad)
+		damage *= 1.5f;
+
+	fire_bullet_sparks(ent, start, forward, damage, kick, spread, spread, MOD_AA12);
+	Stats_AddShot(ent, MOD_AA12);
+	Weapon_Recoil(ent, 50, 50); // Add some recoil... -JukS-
+	ent->client->aa12_rds--;
+
+	if (!sv_shelloff->value)
+	{
+		vec3_t result;
+		Old_ProjectSource(ent->client, ent->s.origin, offset, forward, right, result);
+		EjectShell(ent, result, 0);
+	}
+
+	// zucc vwep
+	ent->client->anim_priority = ANIM_ATTACK;
+	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+	{
+		ent->s.frame = FRAME_crattak1 - (int)(random() + 0.25);
+		ent->client->anim_end = FRAME_crattak9;
+	}
+	else
+	{
+		ent->s.frame = FRAME_attack1 - (int)(random() + 0.25);
+		ent->client->anim_end = FRAME_attack8;
+	}
+	// zucc vwep done
+
+	ent->client->weapon_sound = MZ_SHOTGUN;
+	PlayWeaponSound(ent);
+}
+
+void Weapon_AA12(edict_t* ent) // Added by JukS (using M4 frames)
+{
+	static int pause_frames[] = { 13, 24, 39 };
+	static int fire_frames[] = { 11, 12, 65, 66, 67, 0 };
+	Weapon_Generic(ent, 10, 12, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
 }
 
 // AQ2:TNG Deathwatch - Modified to use Single Barreled HC Mode

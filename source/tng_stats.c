@@ -238,6 +238,9 @@ void Cmd_Stats_f (edict_t *targetent, char *arg)
 		case MOD_M4:
 			string = "M4 Assault Rifle";
 			break;
+		case MOD_AA12: // Added by JukS (11.4.2020)
+			string = "AA12 Shotgun"; // Had to shorten it up -JukS-
+			break;
 		case MOD_MP5:
 			string = "MP5 Submachinegun";
 			break;

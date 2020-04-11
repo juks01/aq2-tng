@@ -945,6 +945,25 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 				message2 = "'s M4 Assault Rifle";
 			}
 			break;
+		case MOD_AA12: // Added by JukS ( 4.4.2020)
+				switch (loc) {
+				case LOC_HDAM:
+					message = " had head blown away by";
+					break;
+				case LOC_CDAM:
+					message = " has no more chest because of"; // TODO Some better here?
+					break;
+				case LOC_SDAM:
+					message = " has some guts to collect because of";
+					break;
+				case LOC_LDAM:
+					message = " walks never again thanks to";
+					break;
+				default:
+					message = " was shot by";
+				}
+				message2 = "'s Auto Assault-12 Shotgun";
+				break;
 		case MOD_M3:
 			n = rand() % 2 + 1;
 			if (n == 1) {
@@ -2042,6 +2061,20 @@ void EquipClient(edict_t * ent)
 			client->inventory[ITEM_INDEX(item)] = 1;
 		client->m4_rds = client->m4_max;
 		break;
+	case AA12_NUM: // Added by JukS (4.4.2020) (equip client)
+		item = GET_ITEM(AA12_NUM);
+		client->selected_item = ITEM_INDEX(item);
+		client->inventory[client->selected_item] = 1;
+		client->weapon = item;
+		client->curr_weap = AA12_NUM;
+		client->unique_weapon_total = 1;
+		item = GET_ITEM(AA12_ANUM);
+		if (band)
+			client->inventory[ITEM_INDEX(item)] = 2;
+		else
+			client->inventory[ITEM_INDEX(item)] = 1;
+		client->aa12_rds = client->aa12_max;
+		break;
 	case M3_NUM:
 		item = GET_ITEM(M3_NUM);
 		client->selected_item = ITEM_INDEX(item);
@@ -2173,6 +2206,19 @@ void EquipClientDM(edict_t * ent)
 			client->unique_weapon_total = 1;
 		}
 		item = GET_ITEM(M4_ANUM);
+		client->inventory[ITEM_INDEX(item)] = 1;
+		break;
+	case AA12_NUM:
+		item = GET_ITEM(AA12_NUM);
+		client->selected_item = ITEM_INDEX(item);
+		client->inventory[client->selected_item] = 1;
+		client->weapon = item;
+		client->aa12_rds = client->aa12_max;
+		client->curr_weap = AA12_NUM;
+		if (!allweapon->value) {
+			client->unique_weapon_total = 1;
+		}
+		item = GET_ITEM(AA12_ANUM);
 		client->inventory[ITEM_INDEX(item)] = 1;
 		break;
 	case M3_NUM:
@@ -2323,12 +2369,13 @@ void PutClientInServer(edict_t * ent)
 
 
 	ent->health = 100;
-	ent->max_health = 120;
+	ent->max_health = 120; // 100->120 - Hmm, maybe one day for some mod -JukS-
 	
 	client->max_pistolmags = 2;
 	client->max_shells = 14;
 	client->max_mp5mags = 2;
 	client->max_m4mags = 1;
+	client->max_shells2 = 1; // Added by JukS (4.4.2020)
 	client->max_sniper_rnds = 20;
 
 	client->knife_max = 10;
@@ -2338,6 +2385,7 @@ void PutClientInServer(edict_t * ent)
 	client->mk23mil_max = 12; // Added by JukS
 	client->mp5_max = 30;
 	client->m4_max = 24;
+	client->aa12_max = 20; // Added by JukS (11.4.2020)
 	client->shot_max = 7;
 	client->sniper_max = 6;
 	client->cannon_max = 2;
