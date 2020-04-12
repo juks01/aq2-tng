@@ -10,10 +10,16 @@ Gameplay modifications
 	-still able to change to old slippers with itm_flags
 	 (greaves 64, old slippers 2)
 
-2. New weapon: Military MK23 SOCOM pistol
+2. New weapons:
+	Military MK23 SOCOM pistol
 	-better version of regular MK23 pistol
 	-already silencer and lasersight attached
 	-able to disable with wp_flags (256)
+	Auto-Assault 12-gauge Shotgun (AA-12)
+	-20 round drum magazine (could change in furure)
+	-300 rounds/min fire rate (not yet applied. Now same as M4)
+	-more details coming later...
+	-able to disanle with wp_flags (512)
 
 3. Some damage modifications
 	-kevlar vest piercing damage increased a bit
@@ -25,6 +31,7 @@ Gameplay modifications
 	 (might be used for small rocket jump)
 	-HC in single barrel mode +75
 	-M3 +50
+	-AA12 +50
 	-SSG +30 (small, because no sense to make SSG better in any way)
 	-M4 +10
 
