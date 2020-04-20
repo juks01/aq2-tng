@@ -1186,12 +1186,20 @@ int canFire (edict_t * ent)
 		if (ent->client->mk23_rds > 0)
 			result = 1;
 		break;
+	case MK23MIL_NUM: // Added by JukS
+		if (ent->client->mk23mil_rds > 0)
+			result = 1;
+		break;
 	case MP5_NUM:
 		if (ent->client->mp5_rds > 0)
 			result = 1;
 		break;
 	case M4_NUM:
 		if (ent->client->m4_rds > 0)
+			result = 1;
+		break;
+	case AA12_NUM: // Added by JukS
+		if (ent->client->aa12_rds > 0)
 			result = 1;
 		break;
 	case M3_NUM:

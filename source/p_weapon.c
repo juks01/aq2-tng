@@ -859,17 +859,14 @@ void Drop_Weapon (edict_t * ent, gitem_t * item)
 		temp->think = temp_think_specweap;
 		ent->client->inventory[index]--;
 	}
-	else if (item->typeNum == AA12_NUM)
+	else if (item->typeNum == AA12_NUM) // Added by JukS ( 4.4.2020)
 	{
-
 		if (ent->client->weapon == item && ent->client->inventory[index] == 1)
 		{
 			replacement = GET_ITEM(MK23_NUM);	// back to the pistol then
 			ent->client->newweapon = replacement;
 			ent->client->weaponstate = WEAPON_DROPPING;
 			ent->client->ps.gunframe = 44;
-
-			//ChangeWeapon( ent );
 		}
 		ent->client->unique_weapon_total--;	// dropping 1 unique weapon
 		temp = Drop_Item(ent, item);
@@ -1101,8 +1098,8 @@ void DropExtraSpecial (edict_t * ent)
 //zucc ready special weapon
 void ReadySpecialWeapon (edict_t * ent)
 {
-	int weapons[7] = { MP5_NUM, M4_NUM, AA12_NUM, M3_NUM, HC_NUM, SNIPER_NUM, MK23MIL_NUM }; // Modified by JukS 11.2.2020
-	int curr, i;
+	int weapons[7] = { MP5_NUM, M4_NUM, AA12_NUM, M3_NUM, HC_NUM, SNIPER_NUM, MK23MIL_NUM };
+	int curr, i;			 // ^^^ Added MK23MIL 11.2.2020 and AA12  4.4.2020 -JukS-
 	int last;
 
 
@@ -1653,17 +1650,19 @@ Weapon_Generic (edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	  }
 	case M4_NUM:
 	  {
-	    if (ent->client->ps.gunframe == 3)	// 3
-	      gi.sound (ent, CHAN_WEAPON,
-			gi.soundindex ("weapons/m4a1slide.wav"), 1, ATTN_NORM,
-			0);
-	    ent->client->fired = 0;	//reset any firing delays
+		if (ent->client->ps.gunframe == 3)	// 3
+			gi.sound (ent, CHAN_WEAPON,
+				gi.soundindex ("weapons/m4a1slide.wav"), 1, ATTN_NORM,
+				0);
+		ent->client->fired = 0;	//reset any firing delays
 	    ent->client->burst = 0;
 	    ent->client->machinegun_shots = 0;
 	    break;
 	  }
-	case AA12_NUM:
+	case AA12_NUM: // Added by JukS  4.4.2020
 	{
+		if (ent->client->ps.gunframe == 3)	// Let's use same as with M4 -JukS-
+			gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/m4a1slide.wav"), 1, ATTN_NORM, 0);
 		ent->client->fired = 0;	//reset any firing delays
 		ent->client->burst = 0;
 		ent->client->fast_reload = 0;
@@ -3016,12 +3015,6 @@ void AA12_Fire(edict_t* ent)
 		return;
 	}
 
-// TODO? Wut? -JukS-
-	if (ent->client->ps.gunframe >= 64 && ent->client->ps.gunframe <= 69)
-	{
-		ent->client->ps.gunframe++;
-	}
-
 	//Oops! Out of ammo!
 	if (ent->client->aa12_rds < 1)
 	{
@@ -3048,7 +3041,7 @@ void AA12_Fire(edict_t* ent)
 		ent->client->kick_angles[i] = crandom() * 0.5;
 	}
 	ent->client->kick_origin[0] = crandom() * 0.35;
-	ent->client->kick_angles[0] = ent->client->machinegun_shots * -.7;
+	ent->client->kick_angles[0] = ent->client->machinegun_shots * -2; // Increased by JukS  4.4.2020
 
 	// get start / end positions
 	VectorAdd(ent->client->v_angle, ent->client->kick_angles, angles);

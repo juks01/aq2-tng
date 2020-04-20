@@ -695,15 +695,15 @@ pmenu_t weapmenu[] = {
   {"Select your Weapon", PMENU_ALIGN_CENTER, NULL, NULL},
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},
   //AQ2:TNG - Igor adding wp_flags
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "MP5/10 Submachinegun", SelectWeapon2
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "M3 Super90 Assault Shotgun", SelectWeapon3
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Handcannon", SelectWeapon4
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "SSG 3000 Sniper Rifle", SelectWeapon5
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "M4 Assault Rifle", SelectWeapon6
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Combat Knives", SelectWeapon0
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Akimbo Pistols", SelectWeapon9
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "USSOCOM MK23", SelectWeapon31
-  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// "Auto Assault-12 Shotgun", SelectWeapon31
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon2	"MP5/10 Submachinegun"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon3	"M3 Super90 Assault Shotgun"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon4	"Handcannon"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon5	"SSG 3000 Sniper Rifle"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon6	"M4 Assault Rifle"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon0	"Combat Knives"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon9	"Akimbo Pistols"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon8	"USSOCOM MK23"
+  {NULL, PMENU_ALIGN_LEFT, NULL, NULL},	// SelectWeapon10	"Auto Assault-12 Shotgun"
   //AQ2:TNG End adding wp_flags
   {NULL, PMENU_ALIGN_LEFT, NULL, NULL},
   //AQ2:TNG - Slicer: changing this
@@ -1178,8 +1178,7 @@ void OpenWeaponMenu (edict_t * ent)
 		{ M4_NUM, SelectWeapon6 },
 		{ KNIFE_NUM, SelectWeapon0 },
 		{ DUAL_NUM, SelectWeapon9 },
-		{ MK23MIL_NUM, SelectWeapon8 },	
-		// Added by JukS 
+		{ MK23MIL_NUM, SelectWeapon8 },	// Added by JukS 
 		{ AA12_NUM, SelectWeapon10 }	// Added by JukS (11.4.2020)
 	};
 	int i, count, pos = 4;

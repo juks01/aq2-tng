@@ -367,12 +367,12 @@ void G_SetStats (edict_t * ent)
 		// zucc display special item and special weapon
 		// Raptor007: Modified to rotate through all carried special weapons and items.
 
-		int icons[ 7 ], icon_count, i; // Modified by JukS 14.2.2020
+		int icons[ 8 ], icon_count, i; // Modified 14.2.2020 to 7 and  4.4.2020 to 8 by JukS
 		int cycle = hud_items_cycle->value * FRAMEDIV;
 
 		icon_count = 0;
-		int weapon_ids[ 7 ] = { SNIPER_NUM, M4_NUM, MP5_NUM, M3_NUM, HC_NUM, DUAL_NUM, MK23MIL_NUM }; // Added MK23MIL -JukS-
-		for( i = 0; i < 7; i ++ )
+		int weapon_ids[ 8 ] = { SNIPER_NUM, M4_NUM, AA12_NUM, MP5_NUM, M3_NUM, HC_NUM, DUAL_NUM, MK23MIL_NUM };
+		for( i = 0; i < 8; i ++ )		// ^^^ Added MK23MIL and AA12 -JukS  4.4.2020
 		{
 			if( INV_AMMO( ent, weapon_ids[i] ) )
 				icons[ icon_count ++ ] = level.pic_items[ weapon_ids[i] ];

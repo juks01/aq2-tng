@@ -877,6 +877,8 @@ void kick_attack (edict_t *ent)
 		if (tr.ent->client && (tr.ent->client->curr_weap == M4_NUM
 			|| tr.ent->client->curr_weap == MP5_NUM
 			|| tr.ent->client->curr_weap == M3_NUM
+//			|| tr.ent->client->curr_weap == MK23MIL_NUM		// Disabled to match normal MK12 -JukS-
+			|| tr.ent->client->curr_weap == AA12_NUM		// Added by JukS  4.4.2020
 			|| tr.ent->client->curr_weap ==	SNIPER_NUM
 			|| tr.ent->client->curr_weap == HC_NUM))		// crandom() > .8 ) 
 		{
@@ -959,6 +961,8 @@ void punch_attack(edict_t * ent)
 			if (tr.ent->client && (tr.ent->client->curr_weap == M4_NUM
 				|| tr.ent->client->curr_weap == MP5_NUM
 				|| tr.ent->client->curr_weap == M3_NUM
+//				|| tr.ent->client->curr_weap == MK23MIL_NUM		// Disabled to match normal MK12 -JukS-
+				|| tr.ent->client->curr_weap == AA12_NUM		// Added by JukS  4.4.2020
 				|| tr.ent->client->curr_weap == SNIPER_NUM
 				|| tr.ent->client->curr_weap == HC_NUM) && damage >= 15)
 			{
