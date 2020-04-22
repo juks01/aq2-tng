@@ -848,6 +848,7 @@ pmove_t;
 #define MZ_IONRIPPER                    16
 #define MZ_BLUEHYPERBLASTER             17
 #define MZ_PHALANX                      18
+#define MZ_AA12                         19 // Added by JukS
 // ^^^
 #define MZ_SILENCED                     128	// bit flag ORed with one of the above numbers
 

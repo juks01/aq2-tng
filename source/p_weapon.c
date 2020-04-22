@@ -2395,6 +2395,10 @@ void PlayWeaponSound( edict_t *ent )
 			gi.sound( ent, CHAN_WEAPON, gi.soundindex("weapons/m4a1fire.wav"), 1, ATTN_LOUD, 0 );
 			MuzzleFlash( ent, MZ_MACHINEGUN );
 			break;
+		case MZ_AA12:
+			gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/aa12fire.wav"), 1, ATTN_LOUD, 0);
+			MuzzleFlash(ent, MZ_SHOTGUN);
+			break;
 		case MZ_SHOTGUN:
 			gi.sound( ent, CHAN_WEAPON, gi.soundindex("weapons/shotgf1b.wav"), 1, ATTN_LOUD, 0 );
 			MuzzleFlash( ent, MZ_SHOTGUN );
@@ -3025,8 +3029,8 @@ void AA12_Fire(edict_t* ent)
 			ent->pain_debounce_framenum = level.framenum + 1 * HZ;
 		}
 		return;
-	}
-
+	}	
+	
 	// causes the ride up
 		ent->client->machinegun_shots++;
 		if (ent->client->machinegun_shots > ent->client->aa12_max)
@@ -3041,7 +3045,8 @@ void AA12_Fire(edict_t* ent)
 		ent->client->kick_angles[i] = crandom() * 0.5;
 	}
 	ent->client->kick_origin[0] = crandom() * 0.35;
-	ent->client->kick_angles[0] = ent->client->machinegun_shots * -2; // Increased by JukS  4.4.2020
+//	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1; // Changed by JukS  22.4.2020
+	ent->client->kick_angles[0] = -5; // Changed by JukS  22.4.2020
 
 	// get start / end positions
 	VectorAdd(ent->client->v_angle, ent->client->kick_angles, angles);
@@ -3054,6 +3059,7 @@ void AA12_Fire(edict_t* ent)
 
 	fire_bullet_sparks(ent, start, forward, damage, kick, spread, spread, MOD_AA12);
 	Stats_AddShot(ent, MOD_AA12);
+	ent->client->ps.gunframe++;
 	Weapon_Recoil(ent, 50, 50); // Add some recoil... -JukS-
 	ent->client->aa12_rds--;
 
@@ -3078,7 +3084,7 @@ void AA12_Fire(edict_t* ent)
 	}
 	// zucc vwep done
 
-	ent->client->weapon_sound = MZ_SHOTGUN;
+	ent->client->weapon_sound = MZ_AA12;
 	PlayWeaponSound(ent);
 }
 
@@ -3095,8 +3101,8 @@ void Weapon_AA12(edict_t* ent) // Added by JukS (using M4 frames)
 	static int fire_frames[] = { 11, 12, 13, 65, 66, 67, 0 };
 	Weapon_Generic(ent, 10, 14, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
 */
-	static int fire_frames[] = { 11, 12, 14, 16, 17, 18, 19, 20, 65, 66, 67, 0 };
-	Weapon_Generic(ent, 10, 21, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
+	static int fire_frames[] = { 11, 0 };
+	Weapon_Generic(ent, 10, 12, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
 }
 
 // AQ2:TNG Deathwatch - Modified to use Single Barreled HC Mode

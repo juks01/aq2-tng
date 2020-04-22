@@ -1442,7 +1442,7 @@ world_model_flags int               copied to 'ent->s.effects' (see s.effects fo
    IT_WEAPON,
    NULL,
    0,
-   "weapons/shotgf1b.wav weapons/m4a1in.wav weapons/m4a1out.wav weapons/m4a1slide.wav weapons/rocklf1a.wav weapons/rocklr1b.wav",
+   "weapons/aa12fire.wav weapons/m4a1in.wav weapons/m4a1out.wav weapons/m4a1slide.wav weapons/rocklf1a.wav weapons/rocklr1b.wav",
   AA12_NUM }
   ,
   {
@@ -1802,11 +1802,11 @@ always owned, never in the world^M
    NULL,
    Drop_Special,
    NULL,
-   "misc/veston.wav",		// sound		// TODO: Armor sound
-   "models/items/slippers/slippers.md2", // TODO: Greaves model
+   "misc/greaves.wav",		// sound
+   "models/items/slippers/greaves.md2",
    0,
    NULL,
-   /* icon */ "slippers", // TODO: Greaves icon
+   /* icon */ "greaves",
    /* pickup */ GREAVES_NAME,
    /* width */ 2,
 	  60,
