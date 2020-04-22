@@ -3082,11 +3082,21 @@ void AA12_Fire(edict_t* ent)
 	PlayWeaponSound(ent);
 }
 
+/* **************************************************************
+	UNDER WORK! Firing speed must be decreased! -JukS-
+****************************************************************/
+
 void Weapon_AA12(edict_t* ent) // Added by JukS (using M4 frames)
 {
-	static int pause_frames[] = { 13, 24, 39 };
-	static int fire_frames[] = { 11, 12, 65, 66, 67, 0 };
-	Weapon_Generic(ent, 10, 12, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
+	//Idle animation entry points - These make the fidgeting look more random
+	static int pause_frames[] = { 15, 24, 39 };
+	//The frames at which the weapon will fire
+/*
+	static int fire_frames[] = { 11, 12, 13, 65, 66, 67, 0 };
+	Weapon_Generic(ent, 10, 14, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
+*/
+	static int fire_frames[] = { 11, 12, 14, 16, 17, 18, 19, 20, 65, 66, 67, 0 };
+	Weapon_Generic(ent, 10, 21, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
 }
 
 // AQ2:TNG Deathwatch - Modified to use Single Barreled HC Mode

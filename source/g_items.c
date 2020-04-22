@@ -386,7 +386,7 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 		if (INV_AMMO(ent, M4_ANUM) > 1)
 			INV_AMMO(ent, M4_ANUM) = 1;
 
-		ent->client->max_shells = 1;
+		ent->client->max_shells2 = 1; // Added by JukS
 		if (INV_AMMO(ent, AA12_ANUM) > 1)
 			INV_AMMO(ent, AA12_ANUM) = 1;
 
@@ -1711,7 +1711,7 @@ always owned, never in the world^M
    /* icon */ "a_shells2",
    /* pickup */ AA12_AMMO_NAME,
    /* width */ 3,
-		7,
+		1, // amount to pick up
 		NULL,
 		IT_AMMO,
 		NULL,
