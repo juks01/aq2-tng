@@ -304,7 +304,7 @@ void spray_blood(edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 		speed = 1500;
 		break;
 	case MOD_M4:
-		speed = 2400;
+		speed = 3000;
 		break;
 	case MOD_KNIFE:
 		speed = 0;
@@ -319,7 +319,7 @@ void spray_blood(edict_t *self, vec3_t start, vec3_t dir, int damage, int mod)
 		speed = 4000;
 		break;
 	case MOD_MK23MIL: // Added by JukS 11.2.2020
-		speed = 2200;
+		speed = 2000;
 		break;
 	case MOD_AA12: // Added by JukS 11.2.2020
 		speed = 4000;
@@ -571,7 +571,8 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 
 					if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN) {
 						// Adding one meat gib from headshot - JukS-
-						ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+						if(sv_gib->value)
+							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 						gi.sound(targ, CHAN_VOICE, level.snd_headshot, 1, ATTN_NORM, 0);
 					}
 				}
@@ -704,7 +705,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						if (attacker->client)
 							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
 								client->pers.netname);
-						if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
+						if (sv_gib->value) //TempFile bloody gibbing
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 					}
 					else if (mod == MOD_M4)
@@ -715,7 +716,18 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
 								client->pers.netname);
 					}
-					else // If have no kevlar vest and weapon is NOT SSG/M4...
+					else if (mod == MOD_AA12)
+					{ // Added by JukS - to give some change against AA12...
+						damage = damage * .5; // Decreased (.65 to .50) by JukS
+						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
+						if (attacker->client)
+							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
+								client->pers.netname);
+						if (sv_gib->value) // Throw some gib like with sniper
+							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+
+					}
+					else // If have no kevlar vest and weapon is NOT SSG/M4/AA12...
 					{
 						damage = damage * .65;
 						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
@@ -780,7 +792,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	{
 		vec3_t temporig;
 		VectorMA(point, 20.0f, dir, temporig);
-		if (mod != MOD_SNIPER)
+		if (mod != MOD_SNIPER || mod != MOD_AA12) // Modified by JukS - more blood with AA12!
 			spray_blood(targ, temporig, dir, damage, mod);
 		else
 			spray_sniper_blood(targ, temporig, dir);

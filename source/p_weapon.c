@@ -2283,7 +2283,7 @@ void weapon_grenade_fire(edict_t* ent, qboolean held)
 #define MK23_SPREAD		140
 #define MP5_SPREAD		250 // DW: Changed this back to original from Edition's 240
 #define M4_SPREAD		300
-#define AA12_SPREAD		350 // Added by JukS  4.4.2020
+#define AA12_SPREAD		300 // Added by JukS  4.4.2020
 #define SNIPER_SPREAD	425
 #define DUAL_SPREAD		300 // DW: Changed this back to original from Edition's 275
 #define MK23MIL_SPREAD	120 // Added by JukS 11.2.2020
@@ -3006,7 +3006,7 @@ void AA12_Fire(edict_t* ent)
 	vec3_t start;
 	vec3_t forward, right;
 	vec3_t angles;
-	int damage = 200;
+	int damage = 180;
 	int kick = 160;
 	vec3_t offset;
 	int spread = AA12_SPREAD;
@@ -3030,12 +3030,12 @@ void AA12_Fire(edict_t* ent)
 		}
 		return;
 	}	
-	
+/* Disabled as unnecessary -JukS-
 	// causes the ride up
 		ent->client->machinegun_shots++;
 		if (ent->client->machinegun_shots > ent->client->aa12_max)
 			ent->client->machinegun_shots = ent->client->aa12_max;
-
+These can be removed later... */
 	spread = AdjustSpread(ent, spread);
 
 	//Calculate the kick angles
@@ -3046,9 +3046,9 @@ void AA12_Fire(edict_t* ent)
 	}
 	ent->client->kick_origin[0] = crandom() * 0.35;
 //	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1; // Changed by JukS  22.4.2020
-	ent->client->kick_angles[0] = -5; // Changed by JukS  22.4.2020
 
-	// get start / end positions
+
+// get start / end positions
 	VectorAdd(ent->client->v_angle, ent->client->kick_angles, angles);
 	AngleVectors(angles, forward, right, NULL);
 	VectorSet(offset, 0, 8, ent->viewheight - height);
@@ -3062,6 +3062,10 @@ void AA12_Fire(edict_t* ent)
 	ent->client->ps.gunframe++;
 	Weapon_Recoil(ent, 50, 50); // Add some recoil... -JukS-
 	ent->client->aa12_rds--;
+
+	// Let's test this here... -JukS-
+	ent->client->kick_angles[0] = -5; // Changed by JukS  22.4.2020
+	// The old kickangles can be removed later if this is OK...
 
 	if (!sv_shelloff->value)
 	{
@@ -3088,19 +3092,11 @@ void AA12_Fire(edict_t* ent)
 	PlayWeaponSound(ent);
 }
 
-/* **************************************************************
-	UNDER WORK! Firing speed must be decreased! -JukS-
-****************************************************************/
-
 void Weapon_AA12(edict_t* ent) // Added by JukS (using M4 frames)
 {
 	//Idle animation entry points - These make the fidgeting look more random
 	static int pause_frames[] = { 15, 24, 39 };
 	//The frames at which the weapon will fire
-/*
-	static int fire_frames[] = { 11, 12, 13, 65, 66, 67, 0 };
-	Weapon_Generic(ent, 10, 14, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
-*/
 	static int fire_frames[] = { 11, 0 };
 	Weapon_Generic(ent, 10, 12, 39, 44, 63, 71, pause_frames, fire_frames, AA12_Fire);
 }
