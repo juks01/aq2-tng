@@ -787,8 +787,47 @@ void Cmd_Bandage_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "You've started bandaging\n");
 }
 
-// function called in generic_weapon function that does the bandaging
 
+// Fast grappling hook -JukS-
+void Cmd_Hook_f(edict_t* ent) {
+	if (!use_grapple) {											// Throw a message if hook is disabled on server
+		gi.cprintf(ent, PRINT_HIGH, "Hook not enabled on this server.\n");
+		return;
+	}
+	else if (ctf->value) {												// If in CTF mode, change to older grapple
+		gitem_t* it;
+		it = GET_ITEM(GRAPPLE_NUM);
+		it->use(ent, it);
+	}
+	else
+	{
+		if (IS_ALIVE(ent)) {									// Proceed only if alive
+			if (INV_AMMO(ent, BAND_NUM)) {							// Allow use only with Bandolier
+				if (ent->client->bandaging) {
+					gi.cprintf(ent, PRINT_HIGH, "Hook can not be used while bandaging!.\n");
+					return;
+				}
+				else if (ent->client->weaponstate == WEAPON_RELOADING) {
+					gi.cprintf(ent, PRINT_HIGH, "Hook can not be used while reloading!.\n");
+					return;
+				}
+				CTFWeapon_Grapple_Fire(ent);
+			}
+			else {												// Throw message if player don't have bandolier
+				gi.cprintf(ent, PRINT_HIGH, "Hook is only available with Bandolier.\n");
+				return;
+			}
+		}
+	}
+}
+
+void Cmd_Unhook_f(edict_t* ent) {
+	if (IS_ALIVE(ent) && !ctf->value)								// Proceed only if alive and not CTF
+		CTFPlayerResetGrapple(ent);
+}
+
+
+// function called in generic_weapon function that does the bandaging
 void Bandage(edict_t * ent)
 {
 	ent->client->leg_noise = 0;

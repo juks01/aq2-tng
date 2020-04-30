@@ -37,8 +37,6 @@ void CTFResetGrapple(edict_t *self)
 
 void CTFGrappleTouch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	float volume = 1.0;
-
 	if (other == self->owner)
 		return;
 
@@ -52,7 +50,6 @@ void CTFGrappleTouch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 	}
 
 	VectorCopy(vec3_origin, self->velocity);
-
 	PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
 
 	if (other->takedamage) {
@@ -63,12 +60,11 @@ void CTFGrappleTouch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t
 
 	self->owner->client->ctf_grapplestate = CTF_GRAPPLE_STATE_PULL; // we're on hook
 	self->enemy = other;
-
 	self->solid = SOLID_NOT;
 
+	float volume = 1.0;
 	if (self->owner->client->silencer_shots)
 		volume = 0.2;
-
 	gi.sound (self->owner, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grpull.wav"), volume, ATTN_NORM, 0);
 	gi.sound (self, CHAN_WEAPON, gi.soundindex("weapons/grapple/grhit.wav"), volume, ATTN_NORM, 0);
 
@@ -94,53 +90,19 @@ void CTFGrappleDrawCable(edict_t *self)
 	P_ProjectSource (self->owner->client, self->owner->s.origin, offset, f, r, start);
 
 	VectorSubtract(start, self->owner->s.origin, offset);
-
-	VectorSubtract (start, self->s.origin, dir);
+	VectorSubtract(start, self->s.origin, dir);
 	distance = VectorLength(dir);
 	// don't draw cable if close
 	if (distance < 64)
 		return;
 
-#if 0
-	if (distance > 256)
-		return;
-
-	// check for min/max pitch
-	vectoangles (dir, angles);
-	if (angles[0] < -180)
-		angles[0] += 360;
-	if (fabs(angles[0]) > 45)
-		return;
-
-	trace_t	tr; //!!
-
-	tr = gi.trace (start, NULL, NULL, self->s.origin, self, MASK_SHOT);
-	if (tr.ent != self) {
-		CTFResetGrapple(self);
-		return;
-	}
-#endif
-
-	// adjust start for beam origin being in middle of a segment
-//	VectorMA (start, 8, f, start);
-
 	VectorCopy (self->s.origin, end);
-	// adjust end z for end spot since the monster is currently dead
-//	end[2] = self->absmin[2] + self->size[2] / 2;
-
 	gi.WriteByte (svc_temp_entity);
-#if 1 //def USE_GRAPPLE_CABLE
 	gi.WriteByte (TE_GRAPPLE_CABLE);
 	gi.WriteShort (self->owner - g_edicts);
 	gi.WritePosition (self->owner->s.origin);
 	gi.WritePosition (end);
 	gi.WritePosition (offset);
-#else
-	gi.WriteByte (TE_MEDIC_CABLE_ATTACK);
-	gi.WriteShort (self - g_edicts);
-	gi.WritePosition (end);
-	gi.WritePosition (start);
-#endif
 	gi.multicast (self->s.origin, MULTICAST_PVS);
 }
 
@@ -154,7 +116,7 @@ void CTFGrapplePull(edict_t *self)
 
 	if (strcmp(self->owner->client->weapon->classname, "weapon_grapple") == 0 &&
 		!self->owner->client->newweapon &&
-		self->owner->client->weaponstate != WEAPON_FIRING &&
+		((self->owner->client->weaponstate != WEAPON_FIRING) && !ctf->value) &&
 		self->owner->client->weaponstate != WEAPON_ACTIVATING) {
 		CTFResetGrapple(self);
 		return;
@@ -172,9 +134,9 @@ void CTFGrapplePull(edict_t *self)
 			gi.linkentity (self);
 		} else
 			VectorCopy(self->enemy->velocity, self->velocity);
+
 		if (self->enemy->takedamage) {
 			float volume = 1.0;
-
 			if (self->owner->client->silencer_shots)
 				volume = 0.2;
 
@@ -207,7 +169,6 @@ void CTFGrapplePull(edict_t *self)
 		if (self->owner->client->ctf_grapplestate == CTF_GRAPPLE_STATE_PULL &&
 			vlen < 64) {
 			float volume = 1.0;
-
 			if (self->owner->client->silencer_shots)
 				volume = 0.2;
 
@@ -217,7 +178,12 @@ void CTFGrapplePull(edict_t *self)
 		}
 
 		VectorNormalize (hookdir);
-		VectorScale(hookdir, CTF_GRAPPLE_PULL_SPEED, hookdir);
+		int pullSpeed;
+		if (ctf->value)
+			pullSpeed = CTF_GRAPPLE_PULL_SPEED;		// Use teamplay pull speed
+		else
+			pullSpeed = TP_GRAPPLE_PULL_SPEED;		// Use default pull speed
+		VectorScale(hookdir, pullSpeed, hookdir);
 		VectorCopy(hookdir, self->owner->velocity);
 		SV_AddGravity(self->owner);
 	}
@@ -288,7 +254,10 @@ void CTFGrappleFire (edict_t *ent, vec3_t g_offset, int damage, int effect)
 	gi.sound (ent, CHAN_RELIABLE+CHAN_WEAPON, gi.soundindex("weapons/grapple/grfire.wav"), volume, ATTN_NORM, 0);
 
 	// hifi: adjust grapple speed
-	speed = CTF_GRAPPLE_SPEED;
+	if (ctf->value)
+		speed = CTF_GRAPPLE_SPEED;
+	else
+		speed = TP_GRAPPLE_SPEED;
 	if(use_grapple->value > 1) {
 		VectorCopy(ent->velocity, velocity);
 		speed += VectorNormalize(velocity)/2;
@@ -309,11 +278,14 @@ void CTFGrappleFire (edict_t *ent, vec3_t g_offset, int damage, int effect)
 
 void CTFWeapon_Grapple_Fire (edict_t *ent)
 {
-	int		damage;
+	if (!ctf->value && lights_camera_action) // For teamplay grapple
+		return;
 
-	damage = 10;
+	int		damage	= 10;					// Defines grapple hit damage
+
 	CTFGrappleFire (ent, vec3_origin, damage, 0);
-	ent->client->ps.gunframe++;
+	if (ctf->value)							// Do this only in ctf -JukS-
+		ent->client->ps.gunframe++;
 }
 
 void CTFWeapon_Grapple (edict_t *ent)
@@ -323,12 +295,13 @@ void CTFWeapon_Grapple (edict_t *ent)
 	int prevstate;
 
 	// if the the attack button is still down, stay in the firing frame
-	if ((ent->client->buttons & BUTTON_ATTACK) && 
-		ent->client->weaponstate == WEAPON_FIRING &&
+	if (((ent->client->buttons & BUTTON_ATTACK) && 
+		ent->client->weaponstate == WEAPON_FIRING) &&
+
 		ent->client->ctf_grapple)
 		ent->client->ps.gunframe = 9;
-
-	if (!(ent->client->buttons & BUTTON_ATTACK) && 
+	if (
+		(!(ent->client->buttons & BUTTON_ATTACK) && ctf->value) && // Added ctf check -JukS-
 		ent->client->ctf_grapple) {
 		CTFResetGrapple(ent->client->ctf_grapple);
 		if (ent->client->weaponstate == WEAPON_FIRING)
@@ -337,11 +310,12 @@ void CTFWeapon_Grapple (edict_t *ent)
 
 
 	if (ent->client->newweapon && 
-		ent->client->ctf_grapplestate > CTF_GRAPPLE_STATE_FLY &&
-		ent->client->weaponstate == WEAPON_FIRING) {
+		ent->client->ctf_grapplestate > CTF_GRAPPLE_STATE_FLY
+		&& ((ent->client->weaponstate == WEAPON_FIRING) && ctf->value)) { // Added ctf check -JukS-
 		// he wants to change weapons while grappled
 		ent->client->weaponstate = WEAPON_DROPPING;
-		ent->client->ps.gunframe = 32;
+		if (ctf->value)												// Do this only in ctf -JukS-
+			ent->client->ps.gunframe = 32;
 	}
 
 	prevstate = ent->client->weaponstate;

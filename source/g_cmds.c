@@ -1826,6 +1826,8 @@ static cmdList_t commandList[] =
 	{ "weapon", Cmd_New_Weapon_f, CMDF_PAUSE },
 	{ "opendoor", Cmd_OpenDoor_f, CMDF_PAUSE },
 	{ "bandage", Cmd_Bandage_f, CMDF_PAUSE },
+	{ "hook", Cmd_Hook_f, CMDF_PAUSE},						// Fast hook command -JukS-
+	{ "unhook", Cmd_Unhook_f, CMDF_PAUSE},					// Fast hook command -JukS-
 	{ "id", Cmd_ID_f, 0 },
 	{ "irvision", Cmd_IR_f, CMDF_PAUSE },
 	{ "playerlist", Cmd_PlayerList_f, 0 },

@@ -3030,12 +3030,7 @@ void AA12_Fire(edict_t* ent)
 		}
 		return;
 	}	
-/* Disabled as unnecessary -JukS-
-	// causes the ride up
-		ent->client->machinegun_shots++;
-		if (ent->client->machinegun_shots > ent->client->aa12_max)
-			ent->client->machinegun_shots = ent->client->aa12_max;
-These can be removed later... */
+
 	spread = AdjustSpread(ent, spread);
 
 	//Calculate the kick angles
@@ -3045,8 +3040,6 @@ These can be removed later... */
 		ent->client->kick_angles[i] = crandom() * 0.5;
 	}
 	ent->client->kick_origin[0] = crandom() * 0.35;
-//	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1; // Changed by JukS  22.4.2020
-
 
 // get start / end positions
 	VectorAdd(ent->client->v_angle, ent->client->kick_angles, angles);
@@ -3057,7 +3050,7 @@ These can be removed later... */
 	if (is_quad)
 		damage *= 1.5f;
 
-	fire_bullet_sparks(ent, start, forward, damage, kick, spread, spread, MOD_AA12);
+	fire_bullet_sniper(ent, start, forward, damage, kick, spread, spread, MOD_AA12);
 	Stats_AddShot(ent, MOD_AA12);
 	ent->client->ps.gunframe++;
 	Weapon_Recoil(ent, 50, 50); // Add some recoil... -JukS-

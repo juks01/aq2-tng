@@ -558,8 +558,8 @@ bind 6 "use Sniper Rifle"
 #define DUAL_NAME    "Dual MK23 Pistols"
 #define KNIFE_NAME   "Combat Knife"
 #define GRENADE_NAME "M26 Fragmentation Grenade"
-#define MK23MIL_NAME "USSOCOM MK23 Pistol" // added by JukS (2.2.2020)
-#define AA12_NAME	 "Auto Assault-12 Shotgun" // added by JukS ( 4.4.2020)
+#define MK23MIL_NAME "USSOCOM MK23 Pistol"			// SOCOM full name -JukS-
+#define AA12_NAME	 "Auto Assault-12 Shotgun"		// AA-12 full name -JukS-
 
 #define SIL_NAME     "Silencer"
 #define SLIP_NAME    "Stealth Slippers"
@@ -567,7 +567,7 @@ bind 6 "use Sniper Rifle"
 #define KEV_NAME     "Kevlar Vest"
 #define HELM_NAME    "Kevlar Helmet"
 #define LASER_NAME   "Lasersight"
-#define GREAVES_NAME "Stealth Slippers & Greaves" // Greaves added by JukS (1.2.2020)
+#define GREAVES_NAME "Stealth Slippers & Greaves"	// Greaves full name -JukS-
 
 #define NO_NUM					0
 
@@ -603,7 +603,7 @@ bind 6 "use Sniper Rifle"
 
 #define GRAPPLE_NUM				27
 
-#define ITEM_MAX_NUM			27
+#define ITEM_MAX_NUM			28
 
 #define WEAPON_COUNT			11
 #define ITEM_COUNT				7
@@ -878,8 +878,8 @@ extern int sm_meat_index;
 #define MOD_DUAL                        7
 #define MOD_KNIFE                       8
 #define MOD_KNIFE_THROWN                9
-#define MOD_MK23MIL                     10 // Added by JukS (15.2.2020)
-#define MOD_AA12                        11 // Added by JukS ( 4.4.2020)
+#define MOD_MK23MIL                     10 // SOCOM pistol. Added by JukS (15.2.2020)
+#define MOD_AA12                        11 // AA12. Added by JukS ( 4.4.2020)
 #define MOD_GRENADE                     12
 #define MOD_G_SPLASH                    13
 #define MOD_HANDGRENADE                 14
@@ -1358,7 +1358,7 @@ void Weapon_Generic( edict_t * ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST
 	int FRAME_RELOAD_LAST, int FRAME_LASTRD_LAST,
 	int *pause_frames, int *fire_frames,
 	void( *fire ) (edict_t * ent) );
-void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil); // Added by JukS (3.3.2020)
+void Weapon_Recoil(edict_t* ent, float vRecoil, float hRecoil); // Weapon recoil kickback. Added by JukS (3.3.2020)
 void PlayWeaponSound( edict_t *ent );
 
 void P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
@@ -1409,17 +1409,16 @@ typedef struct gunStats_s
 typedef struct
 {
 	char userinfo[MAX_INFO_STRING];
-	char netname[16];
-	char ip[64];
-	int hand;
+	char netname[16];			// Name in gameplay
+	char ip[64];				// IP address
+	int hand;					// Player's handedness
 
-	qboolean connected;		// a loadgame will leave valid entities that
-	// just don't have a connection yet
+	qboolean connected;		// a loadgame will leave valid entities that just don't have a connection yet
 
 	int admin;
 
-	gender_t	gender;
-	qboolean spectator;
+	gender_t	gender;			// Player's gender
+	qboolean spectator;			// Is player spectator
 	int firing_style;
 
 	qboolean mvdspec;
@@ -1427,20 +1426,20 @@ typedef struct
 	xmenu_t x_menu;
 
 	gitem_t *chosenItem;		// item for teamplay
-	gitem_t *chosenWeapon;	// weapon for teamplay
+	gitem_t *chosenWeapon;		// weapon for teamplay
 
-	int menu_shown;		// has the main menu been shown
+	int menu_shown;				// has the main menu been shown
 	qboolean dm_selected;		// if dm weapon selection has been done once
 
-	int mk23_mode;		// firing mode, semi or auto
-	int mp5_mode;
-	int m4_mode;
-	int knife_mode;
-	int grenade_mode;
-	int hc_mode;
-	int mk23mil_mode;		// firing mode, semi or auto - Added by JukS
-	int id;			// id command on or off
-	int irvision;			// ir on or off (only matters if player has ir device, currently bandolier)
+	int mk23_mode;				// firing mode, auto or semi
+	int mp5_mode;				// firing mode, auto or 3 burst
+	int m4_mode;				// firing mode, auto or 3 burst
+	int knife_mode;				// slash/throwing
+	int grenade_mode;			// short/medium/long range throw
+	int hc_mode;				// firing mode, 2 barrel or 1 barrel
+	int mk23mil_mode;			// firing mode, auto or semi - Added by JukS
+	int id;						// id command on or off
+	int irvision;				// ir on or off (only matters if player has ir device, currently bandolier)
 
 	ignorelist_t ignorelist;
 }
@@ -1449,21 +1448,19 @@ client_persistant_t;
 // client data that stays across deathmatch respawns
 typedef struct
 {
-  int enterframe;		// level.framenum the client entered the game
+  int enterframe;					// level.framenum the client entered the game
 
-  int score;			// frags, etc
+  int score;						// frags, etc
 
-  vec3_t cmd_angles;		// angles sent over in the last command
+  vec3_t cmd_angles;				// angles sent over in the last command
 
-  int sniper_mode;		//level of zoom
+  int sniper_mode;					// level of zoom
 
-  int kills;			// real kills
+  int kills;						// real kills
+  int deaths;						// deaths
+  int damage_dealt;					// keep track of damage dealt by player to other players
 
-  int deaths;			// deaths
-
-  int damage_dealt;		// keep track of damage dealt by player to other players
-
-  int team;			// team the player is on
+  int team;							// team the player is on
   int subteam;
 
   int ctf_state;
@@ -1474,30 +1471,30 @@ typedef struct
   int ctf_flagsince;
   int ctf_lastfraggedcarrier;
 
-  int joined_team;		// last frame # at which the player joined a team
-  int lastWave;			//last time used wave
+  int joined_team;					// last frame # at which the player joined a team
+  int lastWave;						// last time used wave
 
   radio_t radio;
  
   int motd_refreshes;
   int last_motd_refresh;
-  edict_t *last_chase_target;	// last person they chased, to resume at the same place later...
+  edict_t *last_chase_target;		// last person they chased, to resume at the same place later...
 
-  // Number of team kills this game
-  int team_kills;
+  
+  int team_kills;					// Number of team kills this game
   int team_wounds;
   
   int idletime;
   int tourneynumber;
   edict_t *kickvote;
 
-  char *mapvote;		// pointer to map voted on (if any)
-  char *cvote;			// pointer to config voted on (if any)
-  qboolean scramblevote;	// want scramble
+  char *mapvote;					// pointer to map voted on (if any)
+  char *cvote;						// pointer to config voted on (if any)
+  qboolean scramblevote;			// want scramble
 
-  int ignore_time;		// framenum when the player called ignore - to prevent spamming
+  int ignore_time;					// framenum when the player called ignore - to prevent spamming
 	
-  int stat_mode;    		// Automatical Send of statistics to client
+  int stat_mode;    				// Automatical Send of statistics to client
   int stat_mode_intermission;
 
   int shotsTotal;					//Total number of shots
@@ -1530,7 +1527,7 @@ client_respawn_t;
 struct gclient_s
 {
 	// known to server
-	player_state_t	ps;		// communicated by server to clients
+	player_state_t	ps;				// communicated by server to clients
 	int				ping;
 
 	// known to compatible server
@@ -1541,10 +1538,10 @@ struct gclient_s
 	client_respawn_t	resp;
 	pmove_state_t		old_pmove;	// for detecting out-of-pmove changes
 
-	layout_t	layout;		// set layout stat
-	qboolean	showinventory;	// set layout stat
+	layout_t	layout;				// set layout stat
+	qboolean	showinventory;		// set layout stat
 
-	pmenuhnd_t	menu;		// current menu
+	pmenuhnd_t	menu;				// current menu
 
 	int			ammo_index;
 
@@ -1618,13 +1615,13 @@ struct gclient_s
 	int			max_shells;
 	int			max_mp5mags;
 	int			max_m4mags;
-	int			max_shells2; // Added by JukS  4.4.2020
+	int			max_shells2;			// AA-12 ammo maximum -JukS-
 	int			max_sniper_rnds;
 
 	int			mk23_max;
 	int			mk23_rds;
-	int			mk23mil_max; // Added by JukS 12.2.2020
-	int			mk23mil_rds; // Added by JukS 12.2.2020
+	int			mk23mil_max;			// SOCOM ammo -JukS-
+	int			mk23mil_rds;			// SOCOM ammo -JukS-
 
 	int			dual_max;
 	int			dual_rds;
@@ -1636,8 +1633,8 @@ struct gclient_s
 	int			mp5_rds;
 	int			m4_max;
 	int			m4_rds;
-	int			aa12_max; // Added by JukS  4.4.2020
-	int			aa12_rds; // Added by JukS  4.4.2020
+	int			aa12_max;				// AA-12 rounds maximum -JukS-
+	int			aa12_rds;				// AA-12 current rounds -JukS-
 	int			cannon_max;
 	int			cannon_rds;
 	int			knife_max;
@@ -1658,7 +1655,7 @@ struct gclient_s
 	int			unique_weapon_total;
 	int			unique_item_total;
 	int			drop_knife;
-	int			knife_sound;		// we attack several times when slashing but only want 1 sound
+	int			knife_sound;	// we attack several times when slashing but only want 1 sound
 
 	int			punch_framenum;
 	qboolean	punch_desired;	//controlled in ClientThink
@@ -1911,6 +1908,8 @@ void Cmd_New_Weapon_f (edict_t * ent);
 void Cmd_Weapon_f (edict_t * ent);
 void Cmd_OpenDoor_f (edict_t * ent);
 void Cmd_Bandage_f (edict_t * ent);
+void Cmd_Hook_f(edict_t* ent);								// Fast hook function -JukS-
+void Cmd_Unhook_f(edict_t* ent);							// Fast hook function -JukS-
 void Cmd_ID_f (edict_t * ent);
 void Cmd_IR_f (edict_t * ent);
 int GetWeaponNumFromArg(const char *s);
@@ -1972,7 +1971,7 @@ void AddSplat (edict_t * self, vec3_t point, trace_t * tr);
 #define MK23_AMMO_NAME    "Pistol Magazine"
 #define MP5_AMMO_NAME     "MP5 Magazine"
 #define M4_AMMO_NAME      "M4 Magazine"
-#define AA12_AMMO_NAME    "12 Gauge Slugs" // Added by JukS  4.4.2020
+#define AA12_AMMO_NAME    "12 Gauge Slugs" // Ammo name for AA-12 -JukS-
 #define SHOTGUN_AMMO_NAME "12 Gauge Shells"
 #define SNIPER_AMMO_NAME  "AP Sniper Ammo"
 

@@ -495,7 +495,6 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		switch (mod) {
 		case MOD_MK23:
 		case MOD_DUAL:
-		case MOD_AA12: // Added by JukS ( 4.4.2020)
 		case MOD_MK23MIL: // Added by JukS
 			// damage reduction for longer range pistol shots
 			dist = Distance( targ->s.origin, inflictor->s.origin );
@@ -504,11 +503,12 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			else if (dist > 600.0)
 				damage = (int)(damage * 2 / 3);
 			//Fallthrough
-		case MOD_MP5: // removed my created MP5 distance damage decreament as unnecessary -JukS-
+		case MOD_MP5:
 		case MOD_M4:
 		case MOD_SNIPER:
 		case MOD_KNIFE:
 		case MOD_KNIFE_THROWN:
+		case MOD_AA12: // Added by JukS ( 4.4.2020)
 
 			z_rel = point[2] - targ->s.origin[2];
 			from_top = targ_maxs2 - z_rel;
@@ -564,16 +564,24 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 
 				if (!gotArmor)
 				{
-					damage = damage * 1.8 + 1;
+					damage *= 1.8 + 1;
 					gi.cprintf(targ, PRINT_HIGH, "Head damage\n");
 					if (attacker->client)
 						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the head\n", client->pers.netname);
 
-					if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN) {
-						// Adding one meat gib from headshot - JukS-
-						if(sv_gib->value)
+					if (mod != MOD_KNIFE && mod != MOD_KNIFE_THROWN && mod != MOD_AA12) {
+						if(sv_gib->value)// Adding one meat gib from headshot - JukS-
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 						gi.sound(targ, CHAN_VOICE, level.snd_headshot, 1, ATTN_NORM, 0);
+					}
+					else if (mod == MOD_AA12) // Added by JukS - If no helmet and AA-12 hits
+					{
+						gi.sound(targ, CHAN_VOICE, level.snd_headshot, 1, ATTN_NORM, 0);
+						if (sv_gib->value) // Some more gibs!
+						{
+							ThrowGib(targ, "models/objects/gibs/arm/tris.md2", damage, GIB_ORGANIC);
+							ThrowGib(targ, "models/objects/gibs/bone/tris.md2", damage, GIB_ORGANIC);
+						}
 					}
 				}
 				else if (mod == MOD_SNIPER)
@@ -587,7 +595,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 							"Kevlar Helmet absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = (int) (damage * 0.325);
+					damage *= 0.325;
 					gi.sound(targ, CHAN_VOICE, level.snd_headshot, 1, ATTN_NORM, 0);
 				}
 				else
@@ -600,7 +608,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 							attacker->client->pers.netname );
 					}
 					gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
-					damage = (int)(damage / 2);
+					damage *= .5;
 					bleeding = 0;
 					instant_dam = 1;
 					stopAP = 1;
@@ -621,13 +629,9 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 
 				if (!gotArmor)
 				{
-					damage = damage * .25;
+					damage *= .25;
 					if (attacker->client)
-					{
-						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n",
-							client->pers.netname);
-					}
-
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the legs\n", client->pers.netname);
 					gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
 					targ->client->leg_damage = 1;
 					targ->client->leghits++;
@@ -641,7 +645,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = damage * .285; // Decreased (.325 to .285) by JukS
+					damage *= .285; // Decreased (.325 to .285) by JukS
 					damage_type = LOC_GREAVES;
 					bleeding = 1;
 					instant_dam = 0;
@@ -657,8 +661,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 						gi.cprintf(targ, PRINT_HIGH, "Greaves absorbed most of %s's shot\n",
 							attacker->client->pers.netname);
 					}
-					gi.sound(targ, CHAN_ITEM, gi.soundindex("misc/vest.wav"), 1,
-						ATTN_NORM, 0);
+					gi.sound(targ, CHAN_ITEM, gi.soundindex("misc/vest.wav"), 1, ATTN_NORM, 0);
 					damage = (int)(damage / 8); // Decreased (/10 to /8) by JukS
 					damage_type = LOC_GREAVES;
 					bleeding = 0;
@@ -677,12 +680,9 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				{
 					strcpy( attacker->client->last_damaged_players, client->pers.netname );
 					Stats_AddHit(attacker, mod, LOC_SDAM);
-					gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the stomach\n",
-						client->pers.netname);
+					gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the stomach\n", client->pers.netname);
 				}
-					
-				//TempFile bloody gibbing
-				if (mod == MOD_SNIPER && sv_gib->value)
+				if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
 					ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 			}
 			else		//(z_rel < CHEST_DAMAGE)
@@ -696,67 +696,45 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 					Stats_AddHit(attacker, mod, (gotArmor) ? LOC_KVLR_VEST : LOC_CDAM);
 				}
 
-				if (!gotArmor) // If have no armor...
-				{
-					if (mod == MOD_SNIPER)
-					{ // Added by JukS - to give some change against SSG...
-						damage = damage * .40; // Decreased (.65 to .40) by JukS
-						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-						if (attacker->client)
-							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-								client->pers.netname);
+				if (!gotArmor) {				// If have no chest armor...
+					if (mod == MOD_SNIPER) {		// To give some change against SSG - Added by JukS
+						damage *= .40;
 						if (sv_gib->value) //TempFile bloody gibbing
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 					}
-					else if (mod == MOD_M4)
-					{ // Added by JukS - to give some change against M4...
-						damage = damage * .55; // Decreased (.65 to .55) by JukS
-						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-						if (attacker->client)
-							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-								client->pers.netname);
-					}
-					else if (mod == MOD_AA12)
-					{ // Added by JukS - to give some change against AA12...
-						damage = damage * .5; // Decreased (.65 to .50) by JukS
-						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-						if (attacker->client)
-							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-								client->pers.netname);
+					else if (mod == MOD_AA12) {		// To give some change against AA12 - Added by JukS
+						damage *= .5;
 						if (sv_gib->value) // Throw some gib like with sniper
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+					}
+					else if (mod == MOD_M4)			// To give some change against M4 - Added by JukS
+						damage *= .55;
 
-					}
-					else // If have no kevlar vest and weapon is NOT SSG/M4/AA12...
-					{
-						damage = damage * .65;
-						gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
-						if (attacker->client)
-							gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n",
-								client->pers.netname);
-					}
-				}
-				else if (gotArmor && mod == MOD_SNIPER)
-				{
+					else			// Default: If have no kevlar vest and weapon is NOT SSG/M4/AA12...
+						damage *= .65;
+
+					// Messages to clients. These are same for all chest hits without kevlar vest
+					gi.cprintf(targ, PRINT_HIGH, "Chest damage\n");
 					if (attacker->client)
-					{
+						gi.cprintf(attacker, PRINT_HIGH, "You hit %s in the chest\n", client->pers.netname);
+				}
+				else if (gotArmor && mod == MOD_SNIPER) { // SSG hits to kevlar vest
+					if (attacker->client) {
 						gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest, too bad you have AP rounds...\n",
 							client->pers.netname);
 						gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed some of %s's AP sniper round\n",
 							attacker->client->pers.netname);
 					}
-					damage = damage * .325;
+					damage *= .325;
 				}
-				else
-				{
-					if (attacker->client)
-					{
+				else { // Other hits to kevlar vest
+					if (attacker->client) {
 						gi.cprintf(attacker, PRINT_HIGH, "%s has a Kevlar Vest - AIM FOR THE HEAD!\n",
 							client->pers.netname);
 						gi.cprintf(targ, PRINT_HIGH, "Kevlar Vest absorbed most of %s's shot\n",
 							attacker->client->pers.netname);
 					}
-					gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
+				gi.sound(targ, CHAN_ITEM, level.snd_vesthit, 1, ATTN_NORM, 0);
 				damage = (int)(damage / 8); // Damage increased (/10 to /8) by JukS
 				bleeding = 0;
 				instant_dam = 1;
@@ -774,22 +752,19 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			//shotgun damage report stuff
 			if (client)
 				client->took_damage++;
-
 			bleeding = 1;
 			instant_dam = 0;
 			break;
 		default:
 			break;
 		}
+
 		if(friendlyFire && team_round_going)
-		{
 			Add_TeamWound(attacker, targ, mod);
-		}
     }
 
 
-	if (damage_type && !instant_dam)	// bullets but not vest hits
-	{
+	if (damage_type && !instant_dam) {	// bullets but not vest hits
 		vec3_t temporig;
 		VectorMA(point, 20.0f, dir, temporig);
 		if (mod != MOD_SNIPER || mod != MOD_AA12) // Modified by JukS - more blood with AA12!
@@ -798,10 +773,8 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 			spray_sniper_blood(targ, temporig, dir);
 	}
 
-	if (mod == MOD_FALLING && !(targ->flags & FL_GODMODE) )
-	{
-		if (client && targ->health > 0)
-		{
+	if (mod == MOD_FALLING && !(targ->flags & FL_GODMODE) ) {
+		if (client && targ->health > 0) {
 			gi.cprintf(targ, PRINT_HIGH, "Leg damage\n");
 			client->leg_damage = 1;
 			client->leghits++;
@@ -813,8 +786,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	// friendly fire avoidance
 	// if enabled you can't hurt teammates (but you can hurt yourself)
 	// knockback still occurs
-	if (friendlyFire)
-	{
+	if (friendlyFire) {
 		if (DMFLAGS(DF_NO_FRIENDLY_FIRE) && (!teamplay->value || team_round_going || !ff_afterround->value))
 			damage = 0;
 		else
@@ -837,8 +809,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		knockback = 0;
 
 	// figure momentum add
-	if (knockback && !(dflags & DAMAGE_NO_KNOCKBACK))
-	{
+	if (knockback && !(dflags & DAMAGE_NO_KNOCKBACK)) {
 		switch (targ->movetype) {
 		case MOVETYPE_NONE:
 		case MOVETYPE_BOUNCE:
@@ -846,8 +817,7 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 		case MOVETYPE_STOP:
 			break;
 		default:
-			if( mod != MOD_FALLING )
-			{
+			if( mod != MOD_FALLING ) {
 				float mass = max( targ->mass, 50 );
 				vec3_t flydir = {0.f,0.f,0.f}, kvel = {0.f,0.f,0.f};
 
@@ -856,7 +826,6 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 
 				float accel_scale = (client && (attacker == targ)) ? 1600.f : 500.f; // the rocket jump hack...
 				VectorScale( flydir, accel_scale * (float) knockback / mass, kvel );
-
 				VectorAdd( targ->velocity, kvel, targ->velocity );
 
 				// Raptor007: Don't consider knockback part of falling damage (instant kick death).
@@ -871,22 +840,16 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	save = 0;
 
 	// zucc don't need this stuff, but to remove it need to change how damagefeedback works with colors
-	if (!(dflags & DAMAGE_NO_PROTECTION))
-	{
-		// check for godmode
-		if ((targ->flags & FL_GODMODE))
-		{
+	if (!(dflags & DAMAGE_NO_PROTECTION)) {
+
+		if ((targ->flags & FL_GODMODE)) {									// check for godmode
 			take = 0;
 			save = damage;
 			SpawnDamage(te_sparks, point, normal, save);
 		}
-		// check for invincibility
-		else if (client && client->invincible_framenum > level.framenum)
-		{
-			if (targ->pain_debounce_framenum < level.framenum)
-			{
-				gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1,
-					ATTN_NORM, 0);
+		else if (client && client->invincible_framenum > level.framenum) {	// check for invincibility
+			if (targ->pain_debounce_framenum < level.framenum) {
+				gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1, ATTN_NORM, 0);
 				targ->pain_debounce_framenum = level.framenum + 2 * HZ;
 			}
 			take = 0;
@@ -895,13 +858,16 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	}
 
 	psave = 0; // CheckPowerArmor( targ, point, normal, take, dflags );
-	take -= psave;
-
 	asave = 0; // CheckArmor( targ, point, normal, take, te_sparks, dflags );
+
+/* --- TODO: Remove these? Doesn't do anything? -JukS-
+	take -= psave;
 	take -= asave;
+*/
 
 	//treat cheat/powerup savings the same as armor
 	asave += save;
+
 
 	if (ctf->value)
 		CTFCheckHurtCarrier (targ, attacker);

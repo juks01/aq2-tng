@@ -2629,6 +2629,10 @@ void ClientBegin(edict_t * ent)
 	ent->client = game.clients + (ent - g_edicts - 1);
 
 	ClientBeginDeathmatch(ent);
+
+	// Send fast teamplay grappling hook aliases to client -JukS-
+	stuffcmd(ent, "alias +hook hook\n");
+	stuffcmd(ent, "alias -hook unhook\n");
 }
 
 /*
