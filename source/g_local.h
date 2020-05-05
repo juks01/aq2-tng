@@ -571,25 +571,25 @@ bind 6 "use Sniper Rifle"
 
 #define NO_NUM					0
 
-#define MK23_NUM				1 // 1 (weapon_flags)
-#define MP5_NUM					2 // 2
-#define M4_NUM					3 // 4
-#define M3_NUM					4 // 8
-#define HC_NUM					5 // 16
-#define SNIPER_NUM				6 // 32
-#define DUAL_NUM				7 // 64
-#define KNIFE_NUM				8 // 128
-#define MK23MIL_NUM				9 // 256 - added by JukS (2.2.2020)
-#define AA12_NUM				10 // 512 - added by JukS ( 4.4.2020)
-#define GRENADE_NUM				11 // 1024
+#define MK23_NUM				1 // weapon_flags = 1
+#define MP5_NUM					2 // weapon_flags = 12
+#define M4_NUM					3 // weapon_flags = 14
+#define M3_NUM					4 // weapon_flags = 18
+#define HC_NUM					5 // weapon_flags = 116
+#define SNIPER_NUM				6 // weapon_flags = 132
+#define DUAL_NUM				7 // weapon_flags = 164
+#define KNIFE_NUM				8 // weapon_flags = 1128
+#define MK23MIL_NUM				9 // weapon_flags = 1256 - added by JukS (2.2.2020)
+#define AA12_NUM				10 // weapon_flags = 1512 - added by JukS ( 4.4.2020)
+#define GRENADE_NUM				11 // weapon_flags = 11024
 
-#define SIL_NUM					12 // 1 (itm_flags)
-#define SLIP_NUM				13 // 2
-#define BAND_NUM				14 // 4
-#define KEV_NUM					15 // 8
-#define LASER_NUM				16 // 16
-#define HELM_NUM				17 // 32
-#define GREAVES_NUM				18 // 64 - added by JukS (2.2.2020)
+#define SIL_NUM					12 // itm_flags = 1
+#define SLIP_NUM				13 // itm_flags = 2
+#define BAND_NUM				14 // itm_flags = 4
+#define KEV_NUM					15 // itm_flags = 8
+#define LASER_NUM				16 // itm_flags = 16
+#define HELM_NUM				17 // itm_flags = 32
+#define GREAVES_NUM				18 // itm_flags = 64 - added by JukS (2.2.2020)
 
 #define MK23_ANUM				19
 #define MP5_ANUM				20
@@ -655,6 +655,7 @@ extern itemList_t items[ITEM_MAX_NUM];
 #define GRENADE_IDLE_LAST   69
 #define GRENADE_THROW_FIRST 4
 #define GRENADE_THROW_LAST  9	// throw it on frame 8?
+#define GRENADE_PIN_FRAME 77	// When the pin is taken from grenade
 
 
 // these should be server variables, when I get around to it

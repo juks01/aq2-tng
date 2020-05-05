@@ -287,7 +287,7 @@ edict_t *g_edicts;
 //FIREBLADE
 cvar_t *hostname;
 cvar_t *teamplay;
-cvar_t *greaves; // Toggle for Greaves - Added by JukS (1.2.2020)
+// cvar_t *greaves; // Toggle for Greaves - Added by JukS (1.2.2020) --> TODO: remove. Controlled by itm_flags
 cvar_t *radiolog;
 cvar_t *motd_time;
 cvar_t *actionmaps;
@@ -316,7 +316,7 @@ cvar_t *use_3teams;
 cvar_t *use_kickvote;
 cvar_t *mv_public;		// AQ:TNG - JBravo adding public voting
 cvar_t *vk_public;		// AQ:TNG - JBravo adding public voting
-cvar_t *punishkills;		// AQ:TNG - JBravo adding punishkills
+cvar_t *punishkills;	// AQ:TNG - JBravo adding punishkills
 cvar_t *mapvote_waittime;
 cvar_t *ff_afterround;
 cvar_t *uvtime;			// CTF Invunerability Time
@@ -398,7 +398,7 @@ cvar_t *itm_flags;		// Item Banning
 cvar_t *matchmode;
 cvar_t *darkmatch;		// Darkmatch
 cvar_t *day_cycle;		// If darkmatch is on, this value is the nr of seconds between each interval (day, dusk, night, dawn)
-cvar_t *use_flashlight;         // Allow flashlight when not darkmatch?
+cvar_t *use_flashlight;	// Allow flashlight when not darkmatch?
 cvar_t *hearall;		// used for matchmode
 cvar_t *deadtalk;
 cvar_t *force_skin;
@@ -425,11 +425,8 @@ cvar_t *ammo_respawn;
 
 cvar_t *wave_time;
 
-/*cvar_t *team1score;
-cvar_t *team2score;
-cvar_t *team3score;*/
-cvar_t *stats_endmap; // If on (1) show the fpm/etc stats when the map ends
-cvar_t *stats_afterround;     // Collect TNG stats between rounds
+cvar_t *stats_endmap;		// If on (1) show the fpm/etc stats when the map ends
+cvar_t *stats_afterround;	// Collect TNG stats between rounds
 
 cvar_t *auto_join;
 cvar_t *auto_equip;
@@ -437,10 +434,8 @@ cvar_t *auto_menu;
 
 cvar_t *dm_choose;
 
-//TNG:Freud - new spawning system
-cvar_t *use_oldspawns;
-//TNG:Freud - ghosts
-cvar_t *use_ghosts;
+cvar_t *use_oldspawns;	//TNG:Freud - new spawning system
+cvar_t *use_ghosts;		//TNG:Freud - ghosts
 
 cvar_t *use_punch;
 
@@ -477,7 +472,6 @@ qboolean CheckTimelimit(void);
 int dosoft;
 int softquit = 0;
 
-
 gghost_t ghost_players[MAX_GHOSTS];
 int num_ghost_players;
 
@@ -494,7 +488,6 @@ void ShutdownGame (void)
 	vExitGame ();
 	gi.FreeTags (TAG_LEVEL);
 	gi.FreeTags (TAG_GAME);
-
 	gi.cvar_forceset("g_features", "0");
 }
 
@@ -582,14 +575,12 @@ void ClientEndServerFrames (void)
 		for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++) {
 			if (!ent->inuse || !ent->client)
 				continue;
-
 			ClientEndServerFrame(ent);
 		}
 		return;
 	}
 
-	if( teams_changed && FRAMESYNC )
-	{
+	if( teams_changed && FRAMESYNC ) {
 		updateLayout = 1;
 		teams_changed = false;
 		UpdateJoinMenu();
@@ -599,8 +590,7 @@ void ClientEndServerFrames (void)
 
 	// calc the player views now that all pushing
 	// and damage has been added
-	for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++)
-	{
+	for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++) {
 		if (!ent->inuse || !ent->client)
 			continue;
 
@@ -611,7 +601,6 @@ void ClientEndServerFrames (void)
 				PMenu_Update(ent);
 			else
 				DeathmatchScoreboardMessage(ent, ent->enemy);
-
 			gi.unicast(ent, false);
 		}
 		if (teamplay->value && !ent->client->resp.team)
@@ -620,21 +609,17 @@ void ClientEndServerFrames (void)
 
 	if (updateLayout && spectators && spectator_hud->value) {
 		G_UpdateSpectatorStatusbar();
-		if (level.spec_statusbar_lastupdate >= level.realFramenum - 3 * HZ)
-		{
-			for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++)
-			{
+		if (level.spec_statusbar_lastupdate >= level.realFramenum - 3 * HZ) {
+			for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++) {
 				if (!ent->inuse || !ent->client)
 					continue;
-
 				if (!ent->client->resp.team)
 					G_UpdatePlayerStatusbar(ent, 0);
 			}
 		}
 	}
 
-	for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++)
-	{
+	for (i = 0, ent = g_edicts + 1; i < game.maxclients; i++, ent++) {
 		if (!ent->inuse || !ent->client)
 			continue;
 
@@ -663,7 +648,6 @@ void EndDMLevel (void)
 	time_t tnow = 0;
 	char ltm[64] = "";
 	char mvdstring[512] = "";
-
 	tnow = time ((time_t *) 0);
 	now = localtime (&tnow);
 	(void) strftime (ltm, 64, "%A %d %B %H:%M:%S", now);
@@ -671,8 +655,7 @@ void EndDMLevel (void)
 	IRC_printf (IRC_T_GAME, "Game ending at: %s", ltm);
 
 	// JBravo: Stop q2pro MVD2 recording
-	if (use_mvd2->value)
-	{
+	if (use_mvd2->value) {
 		Com_sprintf( mvdstring, sizeof(mvdstring), "mvdstop\n" );
 		gi.AddCommandString( mvdstring );
 		gi.bprintf( PRINT_HIGH, "Ending MVD recording.\n" );
@@ -680,31 +663,21 @@ void EndDMLevel (void)
 	// JBravo: End MVD2
 
 	// stay on same level flag
-	if (DMFLAGS(DF_SAME_LEVEL))
-	{
+	if (DMFLAGS(DF_SAME_LEVEL)) {
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		nextmapname = ent->map = level.mapname;
 	}
-	//FIREBLADE
-	//  else if (!actionmaps->value || num_maps < 1)
-	//FIREBLADE
-	//Igor[Rock] Begin
-	else if (!actionmaps->value || (num_maps < 1 && (map_num_maps < 1 || !vrot->value || !rrot->value)))
-	//Igor[Rock] End
-	{
-		if (level.nextmap[0])
-		{			// go to a specific map
+	else if (!actionmaps->value || (num_maps < 1 && (map_num_maps < 1 || !vrot->value || !rrot->value))) { //Igor[Rock]
+		if (level.nextmap[0]) {	// go to a specific map
 			ent = G_Spawn ();
 			ent->classname = "target_changelevel";
 			nextmapname = ent->map = level.nextmap;
 		}
-		else
-		{			// search for a changelevel
+		else {					// search for a changelevel
 			ent = G_Find (NULL, FOFS (classname), "target_changelevel");
-			if (!ent)
-			{			// the map designer didn't include a changelevel,
-				// so create a fake ent that goes back to the same level
+			if (!ent) {			// the map designer didn't include a changelevel,
+								// so create a fake ent that goes back to the same level
 				ent = G_Spawn ();
 				ent->classname = "target_changelevel";
 				nextmapname = ent->map = level.mapname;
@@ -712,19 +685,16 @@ void EndDMLevel (void)
 		}
 	}
 	//FIREBLADE
-	else
-	{
+	else {
 		//Igor[Rock] BEGIN
-		if (dosoft==1)
-		{
+		if (dosoft==1) {
 			team_round_going = 0;
 			team_game_going = 0;
 			dosoft=0;
 			ent = G_Spawn ();
 			nextmapname = ent->map = level.nextmap;
 		}
-		else if (vrot->value)
-		{
+		else if (vrot->value) {
 			ent = G_Spawn ();
 			ent->classname = "target_changelevel";
 			Q_strncpyz(level.nextmap, map_votes->mapname, sizeof(level.nextmap));
@@ -736,12 +706,10 @@ void EndDMLevel (void)
 			tmp->next = maptosort;
 			maptosort->next = NULL;
 		}
-		else if (rrot->value)
-		{
+		else if (rrot->value) {
 		// TNG: Making sure the rotation works fine
 		// If there is just one map in the rotation:
-			if(num_maps == 1)
-			{
+			if(num_maps == 1) {
 				cur_map = 0;
 				ent = G_Spawn ();
 				ent->classname = "target_changelevel"; //Yoohoo
@@ -749,8 +717,7 @@ void EndDMLevel (void)
 				nextmapname = ent->map = level.nextmap;
 			} 
 			// if there are 2 or more
-			else 
-			{
+			else {
 				nextmapname = level.mapname;
 				while(!Q_stricmp(level.mapname, nextmapname)) {
 					srand(rand()); // Reinitializing the random generator
@@ -764,8 +731,7 @@ void EndDMLevel (void)
 				}
 			}
 		}
-		else
-		{
+		else {
 		//Igor[Rock] End
 			cur_map++;
 			if (cur_map >= num_maps)
@@ -782,8 +748,7 @@ void EndDMLevel (void)
 	//PG BUND - BEGIN
 	level.tempmap[0] = '\0';
 	vExitLevel (level.tempmap);
-	if (level.tempmap[0])
-	{
+	if (level.tempmap[0]) {
 		// change to new map...
 		byvote = true;
 		nextmapname = ent->map = level.tempmap;	// TempFile added ent->map to fit 1.52 EndDMLevel() conventions
@@ -796,21 +761,18 @@ void EndDMLevel (void)
 	if ((maptosort != NULL) && (num_allvotes > map_num_maps))
 	{				// I inserted the map_num_maps here to block an one user vote rotation...
 		newmappos =	(int) (((100.0 - (((float) maptosort->num_allvotes * 100.0) / (float) num_allvotes)) * ((float) map_num_maps - 1.0)) / 100.0);
-		if (!(newmappos == (map_num_maps - 1)))
-		{
+		if (!(newmappos == (map_num_maps - 1))) {
 			// Delete the map from the end of the list
 			for (tmp = map_votes; tmp->next != maptosort; tmp = tmp->next)
 				;
 
 			tmp->next = NULL;
 			//insert it at the right position
-			if (newmappos == 0)
-			{
+			if (newmappos == 0) {
 				maptosort->next = map_votes;
 				map_votes = maptosort;
 			}
-			else
-			{
+			else {
 				newmappos--;
 				for (tmp = map_votes; newmappos > 0; tmp = tmp->next) {
 					newmappos--;

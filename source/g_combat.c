@@ -684,6 +684,8 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				}
 				if (mod == MOD_SNIPER && sv_gib->value) //TempFile bloody gibbing
 					ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
+				else if (mod == MOD_AA12 && sv_gib->value) //TempFile bloody gibbing
+					ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 			}
 			else		//(z_rel < CHEST_DAMAGE)
 			{
@@ -699,12 +701,12 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 				if (!gotArmor) {				// If have no chest armor...
 					if (mod == MOD_SNIPER) {		// To give some change against SSG - Added by JukS
 						damage *= .40;
-						if (sv_gib->value) //TempFile bloody gibbing
+						if (sv_gib->value)			//TempFile bloody gibbing
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 					}
 					else if (mod == MOD_AA12) {		// To give some change against AA12 - Added by JukS
 						damage *= .5;
-						if (sv_gib->value) // Throw some gib like with sniper
+						if (sv_gib->value)			// Throw some gib like with sniper
 							ThrowGib(targ, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 					}
 					else if (mod == MOD_M4)			// To give some change against M4 - Added by JukS
@@ -767,10 +769,10 @@ T_Damage (edict_t * targ, edict_t * inflictor, edict_t * attacker, vec3_t dir,
 	if (damage_type && !instant_dam) {	// bullets but not vest hits
 		vec3_t temporig;
 		VectorMA(point, 20.0f, dir, temporig);
-		if (mod != MOD_SNIPER || mod != MOD_AA12) // Modified by JukS - more blood with AA12!
-			spray_blood(targ, temporig, dir, damage, mod);
-		else
+		if (mod == MOD_SNIPER || mod == MOD_AA12) // Modified by JukS - more blood with AA12!
 			spray_sniper_blood(targ, temporig, dir);
+		else
+			spray_blood(targ, temporig, dir, damage, mod);
 	}
 
 	if (mod == MOD_FALLING && !(targ->flags & FL_GODMODE) ) {

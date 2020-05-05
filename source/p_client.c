@@ -951,10 +951,10 @@ void ClientObituary(edict_t * self, edict_t * inflictor, edict_t * attacker)
 					message = " had head blown away by";
 					break;
 				case LOC_CDAM:
-					message = " has no more chest because of"; // TODO Some better here?
+					message = " have no more chest because of"; // TODO Some better here?
 					break;
 				case LOC_SDAM:
-					message = " has some guts to collect because of";
+					message = " have some guts to collect because of";
 					break;
 				case LOC_LDAM:
 					message = " walks never again thanks to";
@@ -1280,34 +1280,38 @@ void TossItemsOnDeath(edict_t * ent)
 	if (allweapon->value)// don't drop weapons if allweapons is on
 		return;
 
-	if (WPF_ALLOWED(MK23_NUM) && WPF_ALLOWED(DUAL_NUM)) {
-		// give the player a dual pistol so they can be sure to drop one
-		item = GET_ITEM(DUAL_NUM);
-		ent->client->inventory[ITEM_INDEX(item)]++;
-		EjectItem(ent, item);
-	}
-
 	// check for every item we want to drop when a player dies
-	for (i = MP5_NUM; i < DUAL_NUM; i++) {
+	for (i = WEAPON_FIRST; i < (WEAPON_COUNT); i++) {	// Any but grenade(last) -Updated by JukS-
 		item = GET_ITEM( i );
+		if(ent->client->inventory[ITEM_INDEX(item)] > 5) // Gap 5 to be maximum to be dropped -JukS-
+			ent->client->inventory[ITEM_INDEX(item)] = 5;
 		while (ent->client->inventory[ITEM_INDEX( item )] > 0) {
 			ent->client->inventory[ITEM_INDEX( item )]--;
 			EjectWeapon( ent, item );
 		}
 	}
 
-	item = GET_ITEM(KNIFE_NUM);
-	if (ent->client->inventory[ITEM_INDEX(item)] > 0) {
-		EjectItem(ent, item);
+	// Check if grenade is NOT primed. Primed grenade will be handled in player_die function (drop and expode)
+	item = GET_ITEM(GRENADE_NUM);
+	if (ent->client->curr_weap == GRENADE_NUM
+		&& !((ent->client->ps.gunframe >= GRENADE_IDLE_FIRST && ent->client->ps.gunframe <= GRENADE_PIN_FRAME)
+		 || (ent->client->ps.gunframe >= GRENADE_THROW_FIRST && ent->client->ps.gunframe <= GRENADE_THROW_LAST))) {
+		ent->client->inventory[ITEM_INDEX(item)]--;
+		EjectWeapon(ent, item);
 	}
 
-	item = GET_ITEM(MK23MIL_NUM);
-	if (ent->client->inventory[ITEM_INDEX(item)] > 0) {		// Added by JukS (drop also MK23MIL)
-		EjectItem(ent, item);
+	// Drop also grenades in inventory (limit in 5 grens)
+	if (ent->client->inventory[ITEM_INDEX(item)] > 0) { // TODO: 0 or 1? -JukS-
+		gi.dprintf("Yes >0 grenades!\n");
+		while (ent->client->inventory[ITEM_INDEX(item)] > 0) {
+			if (ent->client->inventory[ITEM_INDEX(item)] > 5) // Gap grenades to 5
+				ent->client->inventory[ITEM_INDEX(item)] = 5;
+			ent->client->inventory[ITEM_INDEX(item)]--;
+			EjectWeapon(ent, item);
+		}
 	}
 
 	// special items
-
 	if (!DMFLAGS(DF_QUAD_DROP))
 		quad = false;
 	else
@@ -1493,7 +1497,7 @@ void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 
 	// zucc - check if they have a primed grenade
 	if (self->client->curr_weap == GRENADE_NUM
-	    && ((self->client->ps.gunframe >= GRENADE_IDLE_FIRST && self->client->ps.gunframe <= GRENADE_IDLE_LAST)
+	    && ((self->client->ps.gunframe >= GRENADE_IDLE_FIRST && self->client->ps.gunframe <= GRENADE_PIN_FRAME)
 		|| (self->client->ps.gunframe >= GRENADE_THROW_FIRST
 		    && self->client->ps.gunframe <= GRENADE_THROW_LAST))) {
 		self->client->ps.gunframe = 0;
@@ -1991,7 +1995,6 @@ void AllItems(edict_t * ent)
 }
 
 // equips a client with item/weapon in teamplay
-
 void EquipClient(edict_t * ent)
 {
 	gclient_t *client;
@@ -2013,8 +2016,7 @@ void EquipClient(edict_t * ent)
 	if (client->pers.chosenItem) {
 		if (client->pers.chosenItem->typeNum == BAND_NUM) {
 			band = 1;
-			if (tgren->value > 0)	// team grenades is turned on
-			{
+			if (tgren->value > 0) {	// team grenades is turned on
 				item = GET_ITEM(GRENADE_NUM);
 				client->inventory[ITEM_INDEX(item)] = tgren->value;
 			}
@@ -2169,7 +2171,6 @@ void EquipClientDM(edict_t * ent)
 	gclient_t *client;
 	gitem_t *item;
 	int itemNum = 0;
-
 	client = ent->client;
 
 	if(use_grapple->value)

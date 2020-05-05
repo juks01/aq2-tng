@@ -823,14 +823,10 @@ void kick_attack (edict_t *ent)
 	vec3_t end;
 	char *genderstr;
 
-
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
-
 	VectorScale(forward, 0, ent->client->kick_origin);
-
 	VectorSet(offset, 0, 0, ent->viewheight - 20);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-
 	VectorMA(start, 25, forward, end);
 
 	PRETRACE();
@@ -844,15 +840,13 @@ void kick_attack (edict_t *ent)
 	if (tr.fraction >= 1.0)
 		return;
 
-	if (tr.ent->takedamage || KickDoor(&tr, ent, forward))
-	{
+	if (tr.ent->takedamage || KickDoor(&tr, ent, forward)) {
 		ent->client->jumping = 0;	// only 1 jumpkick per jump
 
 		if (tr.ent->health <= 0)
 			return;
 
-		if (tr.ent->client)
-		{
+		if (tr.ent->client) {
 			if (tr.ent->client->uvTime)
 				return;
 			
@@ -872,12 +866,11 @@ void kick_attack (edict_t *ent)
 		else
 			T_Damage(tr.ent, ent, ent, forward, tr.endpos, tr.plane.normal, damage, kick, 0, MOD_KICK);
 
-		gi.sound(ent, CHAN_WEAPON, level.snd_kick, 1, ATTN_NORM, 0);
+		gi.sound(ent, CHAN_BODY, level.snd_kick, 1, ATTN_NORM, 0);
 		PlayerNoise (ent, ent->s.origin, PNOISE_SELF);
 		if (tr.ent->client && (tr.ent->client->curr_weap == M4_NUM
 			|| tr.ent->client->curr_weap == MP5_NUM
 			|| tr.ent->client->curr_weap == M3_NUM
-//			|| tr.ent->client->curr_weap == MK23MIL_NUM		// Disabled to match normal MK12 -JukS-
 			|| tr.ent->client->curr_weap == AA12_NUM		// Added by JukS  4.4.2020
 			|| tr.ent->client->curr_weap ==	SNIPER_NUM
 			|| tr.ent->client->curr_weap == HC_NUM))		// crandom() > .8 ) 
@@ -901,13 +894,13 @@ void kick_attack (edict_t *ent)
 }
 
 
-void punch_attack(edict_t * ent)
+void punch_attack(edict_t* ent)
 {
 	vec3_t start, forward, right, offset, end;
 	int damage = 7, kick = 100, friendlyFire = 0;
 	int randmodify;
 	trace_t tr;
-	char *genderstr;
+	char* genderstr;
 
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
 	VectorScale(forward, 0, ent->client->kick_origin);
@@ -918,22 +911,19 @@ void punch_attack(edict_t * ent)
 	tr = gi.trace(ent->s.origin, NULL, NULL, end, ent, MASK_SHOT);
 	POSTTRACE();
 
-	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
-	{
-		if (tr.fraction < 1.0 && tr.ent->takedamage)
-		{
+	if (!((tr.surface) && (tr.surface->flags & SURF_SKY))) {
+		if (tr.fraction < 1.0 && tr.ent->takedamage) {
 			if (tr.ent->health <= 0)
 				return;
 
-			if (tr.ent->client)
-			{
+			if (tr.ent->client) {
 				if (tr.ent->client->uvTime)
 					return;
 
 				if (tr.ent != ent && ent->client && OnSameTeam(tr.ent, ent))
 					friendlyFire = 1;
 
-				if (friendlyFire && DMFLAGS(DF_NO_FRIENDLY_FIRE)){
+				if (friendlyFire && DMFLAGS(DF_NO_FRIENDLY_FIRE)) {
 					if (!teamplay->value || team_round_going || !ff_afterround->value)
 						return;
 				}
@@ -942,26 +932,23 @@ void punch_attack(edict_t * ent)
 			// add some random damage, damage range from 8 to 20.
 			randmodify = rand() % 13 + 1;
 			damage += randmodify;
-			// modify kick by damage
-			kick += (randmodify * 10);
+			kick += (randmodify * 10);	// modify kick by damage
 
-			// reduce damage, if he tries to punch within or out of water
-			if (ent->waterlevel)
+			if (ent->waterlevel) // reduce damage, if he tries to punch within or out of water
 				damage -= rand() % 10 + 1;
-			// reduce kick, if victim is in water
-			if (tr.ent->waterlevel)
+
+			if (tr.ent->waterlevel) // reduce kick, if victim is in water
 				kick /= 2;
 
 			T_Damage(tr.ent, ent, ent, forward, tr.endpos, tr.plane.normal,
 				damage, kick, 0, MOD_PUNCH);
-			gi.sound(ent, CHAN_WEAPON, level.snd_kick, 1, ATTN_NORM, 0);
+			gi.sound(ent, CHAN_BODY, level.snd_kick, 1, ATTN_NORM, 0);
 			PlayerNoise(ent, ent->s.origin, PNOISE_SELF);
 
 			//only hit weapon out of hand if damage >= 15
 			if (tr.ent->client && (tr.ent->client->curr_weap == M4_NUM
 				|| tr.ent->client->curr_weap == MP5_NUM
 				|| tr.ent->client->curr_weap == M3_NUM
-//				|| tr.ent->client->curr_weap == MK23MIL_NUM		// Disabled to match normal MK12 -JukS-
 				|| tr.ent->client->curr_weap == AA12_NUM		// Added by JukS  4.4.2020
 				|| tr.ent->client->curr_weap == SNIPER_NUM
 				|| tr.ent->client->curr_weap == HC_NUM) && damage >= 15)
@@ -998,12 +985,12 @@ void punch_attack(edict_t * ent)
 // 1 - hit player
 // 2 - hit wall
 
-int knife_attack (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
+int knife_attack(edict_t* self, vec3_t start, vec3_t aimdir, int damage, int kick)
 {
 	trace_t tr;
 	vec3_t end;
 
-	VectorMA (start, 45, aimdir, end);
+	VectorMA(start, 45, aimdir, end);
 
 	PRETRACE();
 	tr = gi.trace(self->s.origin, NULL, NULL, end, self, MASK_SHOT);
@@ -1013,24 +1000,19 @@ int knife_attack (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int ki
 	if (tr.surface && (tr.surface->flags & SURF_SKY))
 		return 0;	// we hit the sky, call it a miss
 
-	if (tr.fraction < 1.0)
-	{
+	if (tr.fraction < 1.0) {
 		//glass fx
 		if (0 == Q_stricmp(tr.ent->classname, "func_explosive"))
-		{
 			CGF_SFX_ShootBreakableGlass(tr.ent, self, &tr, MOD_KNIFE);
-		}
-		else if (tr.ent->takedamage)
-		{
+		else if (tr.ent->takedamage) {
 			setFFState(self);
 			T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, 0, MOD_KNIFE);
 			return -2;
 		}
-		else
-		{
+		else {
 			gi.WriteByte(svc_temp_entity);
 			gi.WriteByte(TE_SPARKS);
-			gi.WritePosition (tr.endpos);
+			gi.WritePosition(tr.endpos);
 			gi.WriteDir(tr.plane.normal);
 			gi.multicast(tr.endpos, MULTICAST_PVS);
 			return -1;
@@ -1048,7 +1030,6 @@ void knife_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 	vec3_t move_angles;
 	gitem_t *item;
 
-	
 	if (other == ent->owner)
 		return;
 
@@ -1057,37 +1038,25 @@ void knife_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 		return;
 	}
 
-	if (ent->owner->client)
-	{
+	if (ent->owner->client) {
 		gi.positioned_sound(ent->s.origin, ent, CHAN_WEAPON, gi.soundindex("weapons/clank.wav"), 1, ATTN_NORM, 0);
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 	}
 
-	// calculate position for the explosion entity
-	VectorMA(ent->s.origin, -0.02, ent->velocity, origin);
-
-	//glass fx
-	if (0 == Q_stricmp (other->classname, "func_explosive"))
+	VectorMA(ent->s.origin, -0.02, ent->velocity, origin);		// calculate position for the explosion entity
+	if (0 == Q_stricmp (other->classname, "func_explosive"))	// glass fx
 		return; // ignore it, so it can bounce
 
-
-	if (other->takedamage)
-	{
-		// Players hit by throwing knives add it to their inventory.
+	if (other->takedamage) { // Players hit by throwing knives add it to their inventory.
 		if( other->client && (INV_AMMO(other,KNIFE_NUM) < other->client->knife_max) )
 			INV_AMMO(other,KNIFE_NUM) ++;
-
 		T_Damage(other, ent, ent->owner, ent->velocity, ent->s.origin, plane->normal, ent->dmg, 0, 0, MOD_KNIFE_THROWN);
 	}
-	else
-	{
-		// code to manage excess knives in the game, guarantees that
-		// no more than knifelimit knives will be stuck in walls.  
-		// if knifelimit == 0 then it won't be in effect and it can
-		// start removing knives even when less than the limit are
-		// out there.
-		if (knifelimit->value != 0)
-		{
+	else {
+		// code to manage excess knives in the game, guarantees that no more than knifelimit knives will be stuck in walls.  
+		// if knifelimit == 0 then it won't be in effect and it can start removing knives even when less than 
+		// the limit are out there.
+		if (knifelimit->value != 0) {
 			knives++;
 
 			if (knives > knifelimit->value)
@@ -1118,7 +1087,6 @@ void knife_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 		dropped->classnum = knives;
 
 		vectoangles(ent->velocity, move_angles);
-		//AngleVectors (ent->s.angles, forward, right, up);
 		VectorCopy(ent->s.origin, dropped->s.origin);
 		VectorCopy(dropped->s.origin, dropped->old_origin);
 		VectorCopy(move_angles, dropped->s.angles);
@@ -1132,8 +1100,7 @@ void knife_touch(edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 
 		gi.linkentity(dropped);
 
-		if (!(ent->waterlevel))
-		{
+		if (!(ent->waterlevel)) {
 			gi.WriteByte(svc_temp_entity);
 			gi.WriteByte(TE_SPARKS);
 			gi.WritePosition(origin);
@@ -1179,8 +1146,7 @@ void knife_throw(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed)
 	PRETRACE();
 	tr = gi.trace(self->s.origin, NULL, NULL, knife->s.origin, knife, MASK_SHOT);
 	POSTTRACE();
-	if (tr.fraction < 1.0)
-	{
+	if (tr.fraction < 1.0) {
 		VectorMA(knife->s.origin, -10, dir, knife->s.origin);
 		knife->touch(knife, tr.ent, NULL, NULL);
 	}
@@ -1206,8 +1172,7 @@ will be low enough to not affect things.
 */
 void setFFState (edict_t *ent)
 {
-	if (ent && ent->client)
-	{
+	if (ent && ent->client) {
 		ent->client->team_wounds_before = ent->client->resp.team_wounds;
 		ent->client->ff_warning = 0;
 	}

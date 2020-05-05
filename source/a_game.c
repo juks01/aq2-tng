@@ -620,7 +620,6 @@ void EjectBlooder(edict_t * self, vec3_t start, vec3_t veloc)
 	blooder->nextthink = level.framenum + 3.2 * HZ;
 	blooder->think = G_FreeEdict;
 	blooder->classname = "blooder";
-
 	gi.linkentity(blooder);
 }
 

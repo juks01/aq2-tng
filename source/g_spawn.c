@@ -389,16 +389,12 @@ void ED_CallSpawn (edict_t * ent)
 	CheckItem(ent);
 
 	// check item spawn functions
-	for (i = 0, item = itemlist; i < game.num_items; i++, item++)
-	{
+	for (i = 0, item = itemlist; i < game.num_items; i++, item++) {
 		if (!item->classname)
 			continue;
-		if (!strcmp(item->classname, ent->classname))
-		{	// found it
-
+		if (!strcmp(item->classname, ent->classname)) {	// found it <-- Found what?
 			//FIXME: We do same checks in SpawnItem, do we need these here? -M
-			if (gameSettings & GS_DEATHMATCH)
-			{
+			if (gameSettings & GS_DEATHMATCH) {
 				if (gameSettings & GS_WEAPONCHOOSE)
 					G_FreeEdict( ent );
 				else if (item->flags & (IT_AMMO|IT_WEAPON))
@@ -408,8 +404,7 @@ void ED_CallSpawn (edict_t * ent)
 				else
 					G_FreeEdict(ent);
 			}
-			else if (ctf->value)
-			{
+			else if (ctf->value) {
 				if(item->flags & IT_FLAG)
 					SpawnItem(ent, item);
 				else if(ctf->value == 2 && (item->flags & (IT_AMMO|IT_WEAPON|IT_ITEM|IT_POWERUP)))
@@ -418,27 +413,19 @@ void ED_CallSpawn (edict_t * ent)
 					G_FreeEdict(ent);
 			}
 			else
-			{
 				G_FreeEdict(ent);
-			}
 
 			return;
 		}
 	}
 
 	// check normal spawn functions
-	for (s = spawns; s->name; s++)
-	{
-		if (!strcmp (s->name, ent->classname))
-		{			// found it
+	for (s = spawns; s->name; s++) {
+		if (!strcmp (s->name, ent->classname)) {			// found it
 			s->spawn (ent);
 			return;
 		}
 	}
-
-	/*if(strcmp (ent->classname, "freed") != 0) {
-		gi.dprintf ("%s doesn't have a spawn function\n", ent->classname);
-	}*/
 
 	G_FreeEdict( ent );
 }
@@ -476,16 +463,12 @@ void CheckItem (edict_t * ent)
 {
 	int i;
 
-	for (i = 0; i < ITEM_SWITCH_COUNT; i++)
-	{
-		//If it's a null entry, bypass it
-		if (!sp_item[i][0])
+	for (i = 0; i < ITEM_SWITCH_COUNT; i++) {
+		if (!sp_item[i][0])	//If it's a null entry, bypass it
 			continue;
 		//Do the passed ent and our list match?
-		if (strcmp (ent->classname, sp_item[i][0]) == 0)
-		{
-			//Yep. Replace the Q2 entity with our own.
-			ent->classname = sp_item[i][1];
+		if (strcmp (ent->classname, sp_item[i][0]) == 0) {
+			ent->classname = sp_item[i][1];	//Yep. Replace the Q2 entity with our own.
 			return;
 		}
 	}
@@ -501,17 +484,12 @@ char *ED_NewString (char *string)
 {
 	char *newb, *new_p;
 	int i, l;
-
 	l = strlen (string) + 1;
-
 	newb = gi.TagMalloc (l, TAG_LEVEL);
-
 	new_p = newb;
 
-	for (i = 0; i < l; i++)
-	{
-		if (string[i] == '\\' && i < l - 1)
-		{
+	for (i = 0; i < l; i++) {
+		if (string[i] == '\\' && i < l - 1) {
 			i++;
 			if (string[i] == 'n')
 				*new_p++ = '\n';
@@ -536,48 +514,45 @@ Takes a key/value pair and sets the binary values
 in an edict
 ===============
 */
-void ED_ParseField (char *key, char *value, edict_t * ent)
+void ED_ParseField(char* key, char* value, edict_t* ent)
 {
-	field_t *f;
-	byte *b;
+	field_t* f;
+	byte* b;
 	float v;
 	vec3_t vec;
 
-	for (f = fields; f->name; f++)
-	{
+	for (f = fields; f->name; f++) {
 		// FFL_NOSPAWN check in the following added in 3.20.  Adding here.  -FB
-		if (!(f->flags & FFL_NOSPAWN) && !Q_stricmp (f->name, key))
-		{			// found it
+		if (!(f->flags & FFL_NOSPAWN) && !Q_stricmp(f->name, key)) { // found it <-- Found what?
 			if (f->flags & FFL_SPAWNTEMP)
-				b = (byte *)&st;
+				b = (byte*)&st;
 			else
-				b = (byte *)ent;
+				b = (byte*)ent;
 
-			switch (f->type)
-			{
+			switch (f->type) {
 			case F_LSTRING:
-				*(char **) (b + f->ofs) = ED_NewString (value);
+				*(char**)(b + f->ofs) = ED_NewString(value);
 				break;
 			case F_VECTOR:
-                if (sscanf(value, "%f %f %f", &vec[0], &vec[1], &vec[2]) != 3) {
-                    gi.dprintf("ED_ParseField: couldn't parse '%s'\n", key);
-                    VectorClear(vec);
-                }
-				((float *) (b + f->ofs))[0] = vec[0];
-				((float *) (b + f->ofs))[1] = vec[1];
-				((float *) (b + f->ofs))[2] = vec[2];
-			break;
+				if (sscanf(value, "%f %f %f", &vec[0], &vec[1], &vec[2]) != 3) {
+					gi.dprintf("ED_ParseField: couldn't parse '%s'\n", key);
+					VectorClear(vec);
+				}
+				((float*)(b + f->ofs))[0] = vec[0];
+				((float*)(b + f->ofs))[1] = vec[1];
+				((float*)(b + f->ofs))[2] = vec[2];
+				break;
 			case F_INT:
-				*(int *) (b + f->ofs) = atoi (value);
+				*(int*)(b + f->ofs) = atoi(value);
 				break;
 			case F_FLOAT:
-				*(float *) (b + f->ofs) = atof (value);
+				*(float*)(b + f->ofs) = atof(value);
 				break;
 			case F_ANGLEHACK:
-				v = atof (value);
-				((float *) (b + f->ofs))[0] = 0;
-				((float *) (b + f->ofs))[1] = v;
-				((float *) (b + f->ofs))[2] = 0;
+				v = atof(value);
+				((float*)(b + f->ofs))[0] = 0;
+				((float*)(b + f->ofs))[1] = v;
+				((float*)(b + f->ofs))[2] = 0;
 				break;
 			case F_IGNORE:
 				break;
@@ -599,49 +574,48 @@ ed should be a properly initialized empty edict.
 ====================
 */
 char *
-ED_ParseEdict (char *data, edict_t * ent)
+ED_ParseEdict(char* data, edict_t* ent)
 {
-  qboolean init;
-  char keyname[256];
-  char *com_token;
+	qboolean init;
+	char keyname[256];
+	char* com_token;
 
-  init = false;
-  memset (&st, 0, sizeof (st));
+	init = false;
+	memset(&st, 0, sizeof(st));
 
-// go through all the dictionary pairs
-  while (1)
-    {
-      // parse key
-      com_token = COM_Parse (&data);
-      if (com_token[0] == '}')
-	break;
-      if (!data)
-	gi.error ("ED_ParseEntity: EOF without closing brace");
+	// go through all the dictionary pairs
+	while (1) {
+		// parse key
+		com_token = COM_Parse(&data);
+		if (com_token[0] == '}')
+			break;
+		if (!data)
+			gi.error("ED_ParseEntity: EOF without closing brace");
 
-      Q_strncpyz(keyname, com_token, sizeof(keyname));
+		Q_strncpyz(keyname, com_token, sizeof(keyname));
 
-      // parse value  
-      com_token = COM_Parse (&data);
-      if (!data)
-	gi.error ("ED_ParseEntity: EOF without closing brace");
+		// parse value  
+		com_token = COM_Parse(&data);
+		if (!data)
+			gi.error("ED_ParseEntity: EOF without closing brace");
 
-      if (com_token[0] == '}')
-	gi.error ("ED_ParseEntity: closing brace without data");
+		if (com_token[0] == '}')
+			gi.error("ED_ParseEntity: closing brace without data");
 
-      init = true;
+		init = true;
 
-      // keynames with a leading underscore are used for utility comments,
-      // and are immediately discarded by quake
-      if (keyname[0] == '_')
-	continue;
+		// keynames with a leading underscore are used for utility comments,
+		// and are immediately discarded by quake
+		if (keyname[0] == '_')
+			continue;
 
-      ED_ParseField (keyname, com_token, ent);
-    }
+		ED_ParseField(keyname, com_token, ent);
+	}
 
-  if (!init)
-    memset (ent, 0, sizeof (*ent));
+	if (!init)
+		memset(ent, 0, sizeof(*ent));
 
-  return data;
+	return data;
 }
 
 
@@ -663,8 +637,7 @@ void G_FindTeams (void)
 
 	c = 0;
 	c2 = 0;
-	for (i = 1, e = g_edicts + i; i < globals.num_edicts; i++, e++)
-	{
+	for (i = 1, e = g_edicts + i; i < globals.num_edicts; i++, e++) {
 		if (!e->inuse || !e->team)
 			continue;
 		if (e->flags & FL_TEAMSLAVE)
@@ -673,14 +646,12 @@ void G_FindTeams (void)
 		e->teammaster = e;
 		c++;
 		c2++;
-		for (j = i + 1, e2 = e + 1; j < globals.num_edicts; j++, e2++)
-		{
+		for (j = i + 1, e2 = e + 1; j < globals.num_edicts; j++, e2++) {
 			if (!e2->inuse || !e2->team)
 				continue;
 			if (e2->flags & FL_TEAMSLAVE)
 				continue;
-			if (!strcmp (e->team, e2->team))
-			{
+			if (!strcmp (e->team, e2->team)) {
 				c2++;
 				chain->teamchain = e2;
 				e2->teammaster = e;
@@ -709,8 +680,7 @@ static void PrecacheUserSounds(void)
 	}
 
 	// read the sndlist.ini file
-	while (fgets(buf, sizeof(buf), soundlist) != NULL)
-	{
+	while (fgets(buf, sizeof(buf), soundlist) != NULL) {
 		lenght = strlen(buf);
 		//first remove trailing spaces
 		while (lenght > 0 && buf[lenght - 1] <= ' ')
@@ -723,7 +693,6 @@ static void PrecacheUserSounds(void)
 		Q_strncpyz(fullpath, PG_SNDPATH, sizeof(fullpath));
 		Q_strncatz(fullpath, buf, sizeof(fullpath));
 		gi.soundindex(fullpath);
-		//gi.dprintf("Sound %s: precache %i",fullpath, gi.soundindex(fullpath)); 
 		count++;
 		if (count == 100)
 			break;
@@ -735,53 +704,50 @@ static void PrecacheUserSounds(void)
 		gi.dprintf("%i user sounds precached.\n", count);
 }
 
-void G_LoadLocations( void )
+void G_LoadLocations(void)
 {
 	//AQ2:TNG New Location Code
 	char	locfile[MAX_QPATH], buffer[256];
-	FILE	*f;
+	FILE* f;
 	int		i, x, y, z, rx, ry, rz;
-	char	*locationstr, *param, *line;
-	cvar_t	*game_cvar;
-	placedata_t *loc;
+	char* locationstr, * param, * line;
+	cvar_t* game_cvar;
+	placedata_t* loc;
 
-	memset( ml_creator, 0, sizeof( ml_creator ) );
+	memset(ml_creator, 0, sizeof(ml_creator));
 	ml_count = 0;
 
-	game_cvar = gi.cvar ("game", "", 0);
+	game_cvar = gi.cvar("game", "", 0);
 
 	if (!*game_cvar->string)
 		Com_sprintf(locfile, sizeof(locfile), "%s/tng/%s.aqg", GAMEVERSION, level.mapname);
 	else
 		Com_sprintf(locfile, sizeof(locfile), "%s/tng/%s.aqg", game_cvar->string, level.mapname);
 
-	f = fopen( locfile, "r" );
+	f = fopen(locfile, "r");
 	if (!f) {
-		gi.dprintf( "No location file for %s\n", level.mapname );
+		gi.dprintf("No location file for %s\n", level.mapname);
 		return;
 	}
 
-	gi.dprintf( "Location file: %s\n", level.mapname );
+	gi.dprintf("Location file: %s\n", level.mapname);
 
-	do
-	{
-		line = fgets( buffer, sizeof( buffer ), f );
+	do {
+		line = fgets(buffer, sizeof(buffer), f);
 		if (!line) {
 			break;
 		}
 
-		if (strlen( line ) < 12)
+		if (strlen(line) < 12)
 			continue;
 
-		if (line[0] == '#')
-		{
+		if (line[0] == '#') {
 			param = line + 1;
 			while (*param == ' ') { param++; }
-			if (*param && !Q_strnicmp(param, "creator", 7))
-			{
+			if (*param && !Q_strnicmp(param, "creator", 7)) {
 				param += 8;
 				while (*param == ' ') { param++; }
-				for (i = 0; *param >= ' ' && i < sizeof( ml_creator ) - 1; i++) {
+				for (i = 0; *param >= ' ' && i < sizeof(ml_creator) - 1; i++) {
 					ml_creator[i] = *param++;
 				}
 				ml_creator[i] = 0;
@@ -791,39 +757,39 @@ void G_LoadLocations( void )
 			continue;
 		}
 
-		param = strtok( line, " :\r\n\0" );
+		param = strtok(line, " :\r\n\0");
 		// TODO: better support for file comments
 		if (!param || param[0] == '#')
 			continue;
 
-		x = atoi( param );
+		x = atoi(param);
 
-		param = strtok( NULL, " :\r\n\0" );
+		param = strtok(NULL, " :\r\n\0");
 		if (!param)
 			continue;
-		y = atoi( param );
+		y = atoi(param);
 
-		param = strtok( NULL, " :\r\n\0" );
+		param = strtok(NULL, " :\r\n\0");
 		if (!param)
 			continue;
-		z = atoi( param );
+		z = atoi(param);
 
-		param = strtok( NULL, " :\r\n\0" );
+		param = strtok(NULL, " :\r\n\0");
 		if (!param)
 			continue;
-		rx = atoi( param );
+		rx = atoi(param);
 
-		param = strtok( NULL, " :\r\n\0" );
+		param = strtok(NULL, " :\r\n\0");
 		if (!param)
 			continue;
-		ry = atoi( param );
+		ry = atoi(param);
 
-		param = strtok( NULL, " :\r\n\0" );
+		param = strtok(NULL, " :\r\n\0");
 		if (!param)
 			continue;
-		rz = atoi( param );
+		rz = atoi(param);
 
-		param = strtok( NULL, "\r\n\0" );
+		param = strtok(NULL, "\r\n\0");
 		if (!param)
 			continue;
 		locationstr = param;
@@ -835,16 +801,16 @@ void G_LoadLocations( void )
 		loc->rx = rx;
 		loc->ry = ry;
 		loc->rz = rz;
-		Q_strncpyz( loc->desc, locationstr, sizeof( loc->desc ) );
+		Q_strncpyz(loc->desc, locationstr, sizeof(loc->desc));
 
 		if (ml_count >= MAX_LOCATIONS_IN_BASE) {
-			gi.dprintf( "Cannot read more than %d locations.\n", MAX_LOCATIONS_IN_BASE );
+			gi.dprintf("Cannot read more than %d locations.\n", MAX_LOCATIONS_IN_BASE);
 			break;
 		}
 	} while (1);
 
-	fclose( f );
-	gi.dprintf( "Found %d locations.\n", ml_count );
+	fclose(f);
+	gi.dprintf("Found %d locations.\n", ml_count);
 }
 
 /*
@@ -864,8 +830,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	char *com_token;
 
 	// Reset teamplay stuff
-	for(i = TEAM1; i < TEAM_TOP; i++)
-	{
+	for(i = TEAM1; i < TEAM_TOP; i++) {
 		teams[i].score = teams[i].total = 0;
 		teams[i].ready = teams[i].locked = 0;
 		teams[i].pauses_used = teams[i].wantReset = 0;
@@ -881,41 +846,34 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	teamCount = 2;
 	gameSettings = 0;
 
-	if (ctf->value)
-	{
+	if (ctf->value) {
 		if (ctf->value == 2)
 			gi.cvar_forceset(ctf->name, "1"); //for now
 
 		gameSettings |= GS_WEAPONCHOOSE;
 
 		// Make sure teamplay is enabled
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("CTF Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
-		if (use_3teams->value)
-		{
+		if (use_3teams->value) {
 			gi.dprintf ("CTF Enabled - Forcing 3Teams off\n");
 			gi.cvar_forceset(use_3teams->name, "0");
 		}
-		if(teamdm->value)
-		{
+		if(teamdm->value) {
 			gi.dprintf ("CTF Enabled - Forcing Team DM off\n");
 			gi.cvar_forceset(teamdm->name, "0");
 		}
-		if (use_tourney->value)
-		{
+		if (use_tourney->value) {
 			gi.dprintf ("CTF Enabled - Forcing Tourney off\n");
 			gi.cvar_forceset(use_tourney->name, "0");
 		}
-		if (dom->value)
-		{
+		if (dom->value) {
 			gi.dprintf ("CTF Enabled - Forcing Domination off\n");
 			gi.cvar_forceset(dom->name, "0");
 		}
-		if (!DMFLAGS(DF_NO_FRIENDLY_FIRE))
-		{
+		if (!DMFLAGS(DF_NO_FRIENDLY_FIRE)) {
 			gi.dprintf ("CTF Enabled - Forcing Friendly Fire off\n");
 			gi.cvar_forceset(dmflags->name, va("%i", (int)dmflags->value | DF_NO_FRIENDLY_FIRE));
 		}
@@ -926,22 +884,18 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		strcpy(teams[TEAM1].skin_index, "i_ctf1");
 		strcpy(teams[TEAM2].skin_index, "i_ctf2");
 	}
-	else if (dom->value)
-	{
+	else if (dom->value) {
 		gameSettings |= GS_WEAPONCHOOSE;
 
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("Domination Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
-		if (teamdm->value)
-		{
+		if (teamdm->value) {
 			gi.dprintf ("Domination Enabled - Forcing Team DM off\n");
 			gi.cvar_forceset(teamdm->name, "0");
 		}
-		if (use_tourney->value)
-		{
+		if (use_tourney->value) {
 			gi.dprintf ("Domination Enabled - Forcing Tourney off\n");
 			gi.cvar_forceset(use_tourney->name, "0");
 		}
@@ -955,68 +909,55 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		strcpy(teams[TEAM2].skin_index, "i_ctf2");
 		strcpy(teams[TEAM3].skin_index, "i_pack");
 	}
-	else if(teamdm->value)
-	{
+	else if(teamdm->value) {
 		gameSettings |= GS_DEATHMATCH;
 
 		if (dm_choose->value)
 			gameSettings |= GS_WEAPONCHOOSE;
 
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("Team Deathmatch Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
-		if (use_tourney->value)
-		{
+		if (use_tourney->value) {
 			gi.dprintf ("Team Deathmatch Enabled - Forcing Tourney off\n");
 			gi.cvar_forceset(use_tourney->name, "0");
 		}
 	}
-	else if (use_3teams->value)
-	{
+	else if (use_3teams->value) {
 		gameSettings |= (GS_ROUNDBASED | GS_WEAPONCHOOSE);
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("3 Teams Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
-		if (use_tourney->value)
-		{
+		if (use_tourney->value) {
 			gi.dprintf ("3 Teams Enabled - Forcing Tourney off\n");
 			gi.cvar_forceset(use_tourney->name, "0");
 		}
 	}
-	else if (matchmode->value)
-	{
+	else if (matchmode->value) {
 		gameSettings |= (GS_ROUNDBASED | GS_WEAPONCHOOSE);
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("Matchmode Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
-		if (use_tourney->value)
-		{
+		if (use_tourney->value) {
 			gi.dprintf ("Matchmode Enabled - Forcing Tourney off\n");
 			gi.cvar_forceset(use_tourney->name, "0");
 		}
 	}
-	else if (use_tourney->value)
-	{
+	else if (use_tourney->value) {
 		gameSettings |= (GS_ROUNDBASED | GS_WEAPONCHOOSE);
-		if (!teamplay->value)
-		{
+		if (!teamplay->value) {
 			gi.dprintf ("Tourney Enabled - Forcing teamplay on\n");
 			gi.cvar_forceset(teamplay->name, "1");
 		}
 	}
-	else if (teamplay->value)
-	{
+	else if (teamplay->value) {
 		// gi.dprintf("Teamplay Enabled\n"); // JukS
 		gameSettings |= (GS_ROUNDBASED | GS_WEAPONCHOOSE);
 	}
 	else { //Its deathmatch
-		// gi.dprintf("Deathmatch Enabled\n"); // JukS
 		gameSettings |= GS_DEATHMATCH;
 		if (dm_choose->value)
 			gameSettings |= GS_WEAPONCHOOSE;
@@ -1026,21 +967,15 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		gameSettings |= GS_TEAMPLAY;
 	if (matchmode->value)
 		gameSettings |= GS_MATCHMODE;
-	if (use_3teams->value)
-	{
+	if (use_3teams->value) {
 		teamCount = 3;
-		if (!use_oldspawns->value)
-		{
-			gi.dprintf ("3 Teams Enabled - Forcing use_oldspawns on\n");
+		if (!use_oldspawns->value) {
+			gi.dprintf("3 Teams Enabled - Forcing use_oldspawns on\n");
 			gi.cvar_forceset(use_oldspawns->name, "1");
 		}
 	}
 
-
-
-
 	gi.cvar_forceset(maptime->name, "0:00");
-
 	gi.FreeTags(TAG_LEVEL);
 
 	memset(&level, 0, sizeof (level));
@@ -1052,32 +987,25 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	InitTransparentList();
 
 	// set client fields on player ents
-	for (i = 0, ent = &g_edicts[1]; i < game.maxclients; i++, ent++)
-	{
+	for (i = 0, ent = &g_edicts[1]; i < game.maxclients; i++, ent++) {
 		client = &game.clients[i];
 		ent->client = client;
-
-		// clear everything but the persistant data
-		pers = client->pers;
+		pers = client->pers;	// clear everything but the persistant data
 		int saved_team = client->resp.team;
 		memset(client, 0, sizeof(*client));
 		client->pers = pers;
-		if( pers.connected )
-		{
+		if( pers.connected ) {
 			client->clientNum = i;
-
 			if( auto_join->value )
 				client->resp.team = saved_team;
-
 			// combine name and skin into a configstring
 			AssignSkin( ent, Info_ValueForKey( client->pers.userinfo, "skin" ), false );
 		}
 	}
 
 	ent = NULL;
-	// parse ents
-	while (1)
-	{
+
+	while (1) {		// parse ents
 		// parse the opening brace      
 		com_token = COM_Parse(&entities);
 		if (!entities)
@@ -1099,18 +1027,16 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			ent->spawnflags &= ~SPAWNFLAG_NOT_HARD;
 
 		// remove things (except the world) from different skill levels or deathmatch
-		if (ent != g_edicts)
-		{
-			if (ent->spawnflags & SPAWNFLAG_NOT_DEATHMATCH)
-			{
-				G_FreeEdict (ent);
+		if (ent != g_edicts) {
+			if (ent->spawnflags & SPAWNFLAG_NOT_DEATHMATCH) {
+				G_FreeEdict(ent);
 				inhibit++;
 				continue;
 			}
 
 			ent->spawnflags &=
-			~(SPAWNFLAG_NOT_EASY | SPAWNFLAG_NOT_MEDIUM | SPAWNFLAG_NOT_HARD |
-			SPAWNFLAG_NOT_COOP | SPAWNFLAG_NOT_DEATHMATCH);
+				~(SPAWNFLAG_NOT_EASY | SPAWNFLAG_NOT_MEDIUM | SPAWNFLAG_NOT_HARD |
+					SPAWNFLAG_NOT_COOP | SPAWNFLAG_NOT_DEATHMATCH);
 		}
 
 		ED_CallSpawn (ent);
@@ -1121,10 +1047,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	// AQ2:TNG Igor adding .flg files
 
 	// CTF configuration
-	if(ctf->value)
-	{
-		if(!CTFLoadConfig(level.mapname))
-		{
+	if(ctf->value) {
+		if(!CTFLoadConfig(level.mapname)) {
 			if ((!G_Find(NULL, FOFS (classname), "item_flag_team1") ||
 				 !G_Find(NULL, FOFS (classname), "item_flag_team2")))
 			{
@@ -1142,21 +1066,15 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	// TNG:Freud - Ghosts
 	num_ghost_players = 0;
 
-	if (!(gameSettings & GS_WEAPONCHOOSE))
-	{
-		//zucc for special items
+	if (!(gameSettings & GS_WEAPONCHOOSE))	//zucc for special items
 		SetupSpecSpawn();
-	}
-	else if (teamplay->value)
-	{
+	else if (teamplay->value) {
 		GetSpawnPoints();
-		//TNG:Freud - New spawning system
-		if(!use_oldspawns->value)
+		if(!use_oldspawns->value)	//TNG:Freud - New spawning system
 			NS_GetSpawnPoints();
 	}
 
 	G_LoadLocations();
-
 	UnBan_TeamKillers();
 }
 
@@ -1262,15 +1180,13 @@ void G_SetupStatusbar( void )
 {
 	level.statusbar[0] = 0;
 
-	if (!nohud->value)
-	{
+	if (!nohud->value) {
 		Q_strncpyz(level.statusbar, STATBAR_COMMON, sizeof(level.statusbar));
 
 		if(!((noscore->value || hud_noscore->value) && teamplay->value)) //  frags
 			Q_strncatz(level.statusbar, "xr -50 yt 2 num 3 14 ", sizeof(level.statusbar));
 
-		if (ctf->value)
-		{
+		if (ctf->value) {
 			Q_strncatz(level.statusbar, 
 				// Red Team
 				"yb -164 " "if 24 " "xr -24 " "pic 24 " "endif " "xr -60 " "num 2 26 "
@@ -1311,9 +1227,7 @@ void G_UpdateSpectatorStatusbar( void )
 			continue;
 
 		cl_ent = g_edicts + 1 + i;
-
 		isAlive = IS_ALIVE(cl_ent);
-
 		sprintf( buffer + strlen( buffer ),
 			"yt %d string%s \"%-15s %6d   %5d\" ",
 			48 + count * 8,
@@ -1354,9 +1268,8 @@ void G_UpdateSpectatorStatusbar( void )
 			break;
 	}
 
-	if (strlen( buffer ) > 1023) {
+	if (strlen( buffer ) > 1023)
 		buffer[1023] = 0;
-	}
 
 	if (strcmp(level.spec_statusbar, buffer)) {
 		Q_strncpyz(level.spec_statusbar, buffer, sizeof(level.spec_statusbar));
@@ -1373,14 +1286,12 @@ void G_UpdatePlayerStatusbar( edict_t * ent, int force )
 {
 	char *playerStatusbar;
 
-	if (!teamplay->value || teamCount != 2 || !spectator_hud->value) {
+	if (!teamplay->value || teamCount != 2 || !spectator_hud->value)
 		return;
-	}
 
 	playerStatusbar = level.statusbar;
 
-	if (!ent->client->resp.team)
-	{
+	if (!ent->client->resp.team) {
 		if (level.spec_statusbar_lastupdate < level.realFramenum - 3 * HZ) {
 			G_UpdateSpectatorStatusbar();
 			if (level.spec_statusbar_lastupdate < level.realFramenum - 3 * HZ && !force)
@@ -1417,11 +1328,8 @@ void SP_worldspawn (edict_t * ent)
 	ent->inuse = true;		// since the world doesn't use G_Spawn()
 	ent->s.modelindex = 1;	// world model is always index 1
 
-	// reserve some spots for dead player bodies for coop / deathmatch
-	InitBodyQue();
-
-	// set configstrings for items
-	SetItemNames();
+	InitBodyQue();	// reserve some spots for dead player bodies for coop / deathmatch
+	SetItemNames();	// set configstrings for items
 
 	level.framenum = 0;
 	level.time = 0;
@@ -1429,14 +1337,11 @@ void SP_worldspawn (edict_t * ent)
 	level.pauseFrames = 0;
 	level.matchTime = 0;
 	level.weapon_sound_framenum = 0;
-
 	if (st.nextmap)
 		strcpy(level.nextmap, st.nextmap);
 
 	// make some data visible to the server
-
-	if (ent->message && ent->message[0])
-	{
+	if (ent->message && ent->message[0]) {
 		Q_strncpyz(level.level_name, ent->message, sizeof(level.level_name));
 		gi.configstring(CS_NAME, level.level_name);
 	}
@@ -1488,8 +1393,7 @@ void SP_worldspawn (edict_t * ent)
 
 	gi.imageindex("tag1");
 	gi.imageindex("tag2");
-	if (teamplay->value)
-	{
+	if (teamplay->value) {
 		level.pic_teamtag = gi.imageindex("tag3");
 
 		if (ctf->value) {
@@ -1506,8 +1410,7 @@ void SP_worldspawn (edict_t * ent)
 			gi.imageindex("sbfctf2");
 		}
 
-		for(i = TEAM1; i <= teamCount; i++)
-		{
+		for(i = TEAM1; i <= teamCount; i++) {
 			if (teams[i].skin_index[0] == 0) {
 				gi.dprintf("No skin was specified for team %i in config file. Exiting.\n", i);
 				exit(1);
@@ -1695,8 +1598,7 @@ int LoadFlagsFromFile (const char *mapname)
 	// FIXME: remove this functionality completely in the future
 	gi.dprintf("Warning: .flg files are deprecated, use .ctf ones for more control!\n");
 
-	while (fgets(buf, 1000, fp) != NULL)
-	{
+	while (fgets(buf, 1000, fp) != NULL) {
 		length = strlen(buf);
 		if (length < 7)
 			continue;
@@ -1716,7 +1618,6 @@ int LoadFlagsFromFile (const char *mapname)
 			continue;
 
 		ent = G_Spawn ();
-
 		ent->spawnflags &=
 			~(SPAWNFLAG_NOT_EASY | SPAWNFLAG_NOT_MEDIUM | SPAWNFLAG_NOT_HARD |
 			SPAWNFLAG_NOT_COOP | SPAWNFLAG_NOT_DEATHMATCH);
@@ -1725,7 +1626,7 @@ int LoadFlagsFromFile (const char *mapname)
 
 		if (!flagCount)	// Red Flag
 			ent->classname = ED_NewString ("item_flag_team1");
-		else	// Blue Flag
+		else			// Blue Flag
 			ent->classname = ED_NewString ("item_flag_team2");
 
 		ED_CallSpawn (ent);
@@ -1762,59 +1663,41 @@ void ChangePlayerSpawns ()
 		return;
 	}
 
-	while ((spot = G_Find(spot, FOFS(classname), "info_player_deathmatch")) != NULL)
-	{
+	while ((spot = G_Find(spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
 		range = Distance(spot->s.origin, flag1->s.origin);
-		if (range < range1)
-		{
+		if (range < range1) {
 			range3 = range1;
 			spot3 = spot1;
 			range1 = range;
 			spot1 = spot;
 		}
-		else if (range < range3)
-		{
+		else if (range < range3) {
 			range3 = range;
 			spot3 = spot;
 		}
 
 		range = Distance(spot->s.origin, flag2->s.origin);
-		if (range < range2)
-		{
+		if (range < range2) {
 			range4 = range2;
 			spot4 = spot2;
 			range2 = range;
 			spot2 = spot;
 		}
-		else if (range < range4)
-		{
+		else if (range < range4) {
 			range4 = range;
 			spot4 = spot;
 		}
 	}
 
 	if (spot1)
-	{
-		// gi.dprintf ("Ersetze info_player_deathmatch auf <%f %f %f> durch info_player_team1\n", spot1->s.origin[0], spot1->s.origin[1], spot1->s.origin[2]);
 		strcpy (spot1->classname, "info_player_team1");
-	}
 
 	if (spot2)
-	{
-		// gi.dprintf ("Ersetze info_player_deathmatch auf <%f %f %f> durch info_player_team2\n", spot2->s.origin[0], spot2->s.origin[1], spot2->s.origin[2]);
 		strcpy (spot2->classname, "info_player_team2");
-	}
 
 	if (spot3)
-	{
-		// gi.dprintf ("Ersetze info_player_deathmatch auf <%f %f %f> durch info_player_team1\n", spot3->s.origin[0], spot3->s.origin[1], spot3->s.origin[2]);
 		strcpy (spot3->classname, "info_player_team1");
-	}
 
 	if (spot4)
-	{
-		// gi.dprintf ("Ersetze info_player_deathmatch auf <%f %f %f> durch info_player_team2\n", spot4->s.origin[0], spot4->s.origin[1], spot4->s.origin[2]);
 		strcpy (spot4->classname, "info_player_team2");
-	}
-
 }
