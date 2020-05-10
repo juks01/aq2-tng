@@ -400,9 +400,7 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 void DropSpecialItem (edict_t * ent)
 {
 	// this is the order I'd probably want to drop them in...       
-	if (INV_AMMO(ent, SIL_NUM))
-		Drop_Special(ent, GET_ITEM(SIL_NUM));
-	else if (INV_AMMO(ent, HELM_NUM))
+	if (INV_AMMO(ent, HELM_NUM))
 		Drop_Special(ent, GET_ITEM(HELM_NUM));
 	else if (INV_AMMO(ent, SLIP_NUM))
 		Drop_Special(ent, GET_ITEM(SLIP_NUM));
@@ -414,6 +412,8 @@ void DropSpecialItem (edict_t * ent)
 		Drop_Special(ent, GET_ITEM(LASER_NUM));
 	else if (INV_AMMO(ent, KEV_NUM))
 		Drop_Special (ent, GET_ITEM(KEV_NUM));
+	else if (INV_AMMO(ent, SIL_NUM)) // Silencer last 'cause it's "free"
+			Drop_Special(ent, GET_ITEM(SIL_NUM));
 }
 
 

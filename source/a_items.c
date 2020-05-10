@@ -38,7 +38,7 @@
 // time too wait between failures to respawn?
 #define SPEC_RESPAWN_TIME       60
 // time before they will get respawned
-#define SPEC_TECH_TIMEOUT       60
+// #define SPEC_TECH_TIMEOUT       60	 // Not in use -JukS-
 
 void SpecThink(edict_t * spec);
 
@@ -65,6 +65,8 @@ static void SpawnSpec(gitem_t * item, edict_t * spot)
 	ent->typeNum = item->typeNum;
 	ent->item = item;
 	ent->spawnflags = DROPPED_ITEM;
+	if (item == (GET_ITEM(AA12_NUM)))
+		ent->spawnflags = DROPPED_PLAYER_ITEM; // Gives full ammo on spawn
 	ent->s.effects = item->world_model_flags;
 	ent->s.renderfx = RF_GLOW;
 	VectorSet(ent->mins, -15, -15, -15);
@@ -108,23 +110,18 @@ void SpawnSpecs(edict_t * ent)
 	if(item_respawnmode->value)
 		return;
 
-	for(i = 0; i<ITEM_COUNT; i++)
-	{
+	for(i = 0; i<ITEM_COUNT; i++) {
 		itemNum = ITEM_FIRST + i;
 		if (!ITF_ALLOWED(itemNum))
 			continue;
 
-		if ((spec = GET_ITEM(itemNum)) != NULL && (spot = FindSpecSpawn()) != NULL) {
-			// gi.dprintf("Spawning special item '%s'.\n", GET_ITEM(itemNum)->pickup_name); // Modified by JukS
+		if ((spec = GET_ITEM(itemNum)) != NULL && (spot = FindSpecSpawn()) != NULL)
 			SpawnSpec(spec, spot);
-		}
-
 	}
 
 	// Added new weapon (AA-12) to be spawned with items in Deathmatch -JukS- ( 4.4.2020)
 	// This makes it happen only at first spawn
-	if (!ITF_ALLOWED(AA12_NUM))
-	{
+	if (!ITF_ALLOWED(AA12_NUM) && !DMFLAGS(DF_WEAPONS_STAY)) {
 		if ((spec = GET_ITEM(AA12_NUM)) != NULL && (spot = FindSpecSpawn()) != NULL) {
 			gi.dprintf("Spawning AA-12 with items...\n"); // TODO: Remove debug text
 			SpawnSpec(spec, spot);
@@ -132,8 +129,7 @@ void SpawnSpecs(edict_t * ent)
 	}
 	// Added new weapon (SOCOM) to be spawned with items in Deathmatch -JukS-
 	// This makes it happen only at first spawn
-	if (!ITF_ALLOWED(MK23MIL_NUM))
-	{
+	if (!ITF_ALLOWED(MK23MIL_NUM) && !DMFLAGS(DF_WEAPONS_STAY)) {
 		if ((spec = GET_ITEM(MK23MIL_NUM)) != NULL && (spot = FindSpecSpawn()) != NULL) {
 			gi.dprintf("Spawning SOCOM with items...\n"); // TODO: Remove debug text
 			SpawnSpec(spec, spot);
@@ -144,11 +140,9 @@ void SpawnSpecs(edict_t * ent)
 void SpecThink(edict_t * spec)
 {
 	edict_t *spot;
-
 	spot = FindSpecSpawn();
-	if (spot) {
+	if (spot)
 		SpawnSpec(spec->item, spot);
-	}
 
 	G_FreeEdict(spec);
 }
@@ -191,7 +185,6 @@ void Drop_Spec(edict_t * ent, gitem_t * item)
 	edict_t *spec;
 
 	spec = Drop_Item(ent, item);
-	//gi.cprintf(ent, PRINT_HIGH, "Dropping special item.\n");
 	spec->nextthink = level.framenum + 1 * HZ;
 	spec->think = MakeTouchSpecThink;
 	//zucc this and the one below should probably be -- not = 0, if
@@ -205,8 +198,7 @@ void DeadDropSpec(edict_t * ent)
 	edict_t *dropped;
 	int i, itemNum;
 
-	for(i = 0; i<ITEM_COUNT; i++)
-	{
+	for(i = 0; i<ITEM_COUNT; i++) {
 		itemNum = ITEM_FIRST + i;
 		if (INV_AMMO(ent, itemNum) > 0) {
 			spec = GET_ITEM(itemNum);
@@ -227,7 +219,6 @@ void DeadDropSpec(edict_t * ent)
 void RespawnSpec(edict_t * ent)
 {
 	edict_t *spot;
-
 	if ((spot = FindSpecSpawn()) != NULL)
 		SpawnSpec(ent->item, spot);
 	G_FreeEdict(ent);
@@ -236,10 +227,8 @@ void RespawnSpec(edict_t * ent)
 void SetupSpecSpawn(void)
 {
 	edict_t *ent;
-
 	if (level.specspawn)
 		return;
-
 	ent = G_Spawn();
 	ent->nextthink = level.framenum + 4 * HZ;
 	ent->think = SpawnSpecs;
