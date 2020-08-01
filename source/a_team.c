@@ -830,30 +830,26 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 	char t[MAX_SKINLEN], skin[64] = "\0";
 	const char *default_skin = "male/grunt";
 
-	if( force_skin->string[0] )
-	{
+	if( force_skin->string[0] ) {
 		s = force_skin->string;
 		default_skin = force_skin->string;
 	}
 
-	if( (ctf->value || dom->value) && ! matchmode->value )
-	{
+	if( (ctf->value || dom->value) && ! matchmode->value ) {
 		// forcing CTF model
 		if(ctf_model->string[0]) {
 			/* copy at most bytes that the skin name itself fits in with the delimieter and NULL */
 			Q_strncpyz( t, ctf_model->string, MAX_SKINLEN-strlen(CTF_TEAM1_SKIN)-1 );
 			Q_strncatz(t, "/", sizeof(t));
-		} else {
+		} else
 			Q_strncpyz(t, s, sizeof(t));
-		}
 
 		if ((p = strrchr (t, '/')) != NULL)
 			p[1] = 0;
 		else
 			strcpy (t, "male/");
 
-		switch (ent->client->resp.team)
-		{
+		switch (ent->client->resp.team) {
 		case TEAM1:
 			Com_sprintf(skin, sizeof(skin), "%s\\%s%s", ent->client->pers.netname, t, CTF_TEAM1_SKIN);
 			break;
@@ -865,10 +861,8 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			break;
 		}
 	}
-	else
-	{
-		switch (ent->client->resp.team)
-		{
+	else {
+		switch (ent->client->resp.team) {
 		case TEAM1:
 		case TEAM2:
 		case TEAM3:
@@ -879,7 +873,6 @@ void AssignSkin (edict_t * ent, const char *s, qboolean nickChanged)
 			break;
 		}
 	}
-
 	gi.configstring(CS_PLAYERSKINS + playernum, skin);
 }
 
@@ -1001,19 +994,16 @@ void JoinTeam (edict_t * ent, int desired_team, int skip_menuclose)
 	if (oldTeam == desired_team || ent->client->pers.mvdspec)
 		return;
 
-	if (matchmode->value)
-	{
+	if (matchmode->value) {
 		if (mm_allowlock->value && teams[desired_team].locked) {
 			if (skip_menuclose)
 				gi.cprintf(ent, PRINT_HIGH, "Cannot join %s (locked)\n", TeamName(desired_team));
 			else
 				gi.centerprintf(ent, "Cannot join %s (locked)", TeamName(desired_team));
-
 			return;
 		}
 	}
-	else
-	{
+	else {
 		if(eventeams->value && desired_team != NOTEAM) {
 			if(!IsAllowedToJoin(ent, desired_team)) {
 				gi.centerprintf(ent, "Cannot join %s (has too many players)", TeamName(desired_team));
@@ -1025,7 +1015,6 @@ void JoinTeam (edict_t * ent, int desired_team, int skip_menuclose)
 	MM_LeftTeam( ent );
 
 	a = (oldTeam == NOTEAM) ? "joined" : "changed to";
-
 	ent->client->resp.team = desired_team;
 	s = Info_ValueForKey (ent->client->pers.userinfo, "skin");
 	AssignSkin(ent, s, false);
@@ -1033,29 +1022,25 @@ void JoinTeam (edict_t * ent, int desired_team, int skip_menuclose)
 	ent->flags &= ~FL_GODMODE;
 	killPlayer(ent, true);
 
-	if (ctf->value)
-	{
+	if (ctf->value) {
 		ent->client->resp.ctf_state = CTF_STATE_START;
 		gi.bprintf (PRINT_HIGH, "%s %s %s.\n", ent->client->pers.netname, a, CTFTeamName(desired_team));
 		IRC_printf (IRC_T_GAME, "%n %s %n.", ent->client->pers.netname, a, CTFTeamName(desired_team));
 	}
-	else
-	{
+	else {
 		gi.bprintf (PRINT_HIGH, "%s %s %s.\n", ent->client->pers.netname, a, TeamName(desired_team));
 		IRC_printf (IRC_T_GAME, "%n %s %n.", ent->client->pers.netname, a, TeamName(desired_team));
 	}
 
 	ent->client->resp.joined_team = level.realFramenum;
 
-	if (oldTeam == NOTEAM || desired_team == NOTEAM) {
+	if (oldTeam == NOTEAM || desired_team == NOTEAM)
 		G_UpdatePlayerStatusbar(ent, 1);
-	}
 
 	if (level.intermission_framenum)
 		return;
 
-	if (!(gameSettings & GS_ROUNDBASED) && team_round_going && ent->inuse && ent->client->resp.team)
-	{
+	if (!(gameSettings & GS_ROUNDBASED) && team_round_going && ent->inuse && ent->client->resp.team) {
 		PutClientInServer (ent);
 		AddToTransparentList (ent);
 	}

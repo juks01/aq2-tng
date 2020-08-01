@@ -790,18 +790,17 @@ void Cmd_Bandage_f(edict_t *ent)
 
 // Fast grappling hook -JukS-
 void Cmd_Hook_f(edict_t* ent) {
-	if (!(use_grapple->value)) {								// Throw a message if hook is disabled on server
-		gi.cprintf(ent, PRINT_HIGH, "Hook not enabled on this server.\n");
-		return;
-	}
-	else if (ctf->value) {										// If in CTF mode, change to older grapple
-		gitem_t* it;
-		it = GET_ITEM(GRAPPLE_NUM);
-		it->use(ent, it);
-	}
-	else
-	{
-		if (IS_ALIVE(ent)) {									// Proceed only if alive
+	if (IS_ALIVE(ent)) {										// Proceed only if alive
+		if (!(use_grapple->value)) {								// Throw a message if hook is disabled on server
+			gi.cprintf(ent, PRINT_HIGH, "Hook not enabled on this server.\n");
+			return;
+		}
+		else if (ctf->value) {										// If in CTF mode, change to older grapple
+			gitem_t* it;
+			it = GET_ITEM(GRAPPLE_NUM);
+			it->use(ent, it);
+		}
+		else {
 			if (INV_AMMO(ent, BAND_NUM)) {							// Allow use only with Bandolier
 				if (ent->client->bandaging) {
 					gi.cprintf(ent, PRINT_HIGH, "Hook can not be used while bandaging!.\n");

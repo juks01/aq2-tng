@@ -320,7 +320,6 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 
 	if (item->typeNum != SIL_NUM) // Don't count silencer as spec item -JukS-
 		ent->client->unique_item_total--;
-//	gi.dprintf("SpecItems: %d\n", ent->client->unique_item_total); // for debugging...
 
 	if (item->typeNum == BAND_NUM && INV_AMMO(ent, BAND_NUM) <= 1) {
 		if (gameSettings & GS_DEATHMATCH)
@@ -397,25 +396,23 @@ void Drop_Special (edict_t * ent, gitem_t * item)
 }
 
 // called by the "drop item" command
-void DropSpecialItem (edict_t * ent)
-{
-	// this is the order I'd probably want to drop them in...       
+void DropSpecialItem(edict_t* ent)
+{	// this is the order I'd probably want to drop them in...
 	if (INV_AMMO(ent, HELM_NUM))
 		Drop_Special(ent, GET_ITEM(HELM_NUM));
 	else if (INV_AMMO(ent, SLIP_NUM))
 		Drop_Special(ent, GET_ITEM(SLIP_NUM));
 	else if (INV_AMMO(ent, BAND_NUM))
-		Drop_Special (ent, GET_ITEM(BAND_NUM));
+		Drop_Special(ent, GET_ITEM(BAND_NUM));
 	else if (INV_AMMO(ent, GREAVES_NUM))
 		Drop_Special(ent, GET_ITEM(GREAVES_NUM));
 	else if (INV_AMMO(ent, LASER_NUM))
 		Drop_Special(ent, GET_ITEM(LASER_NUM));
 	else if (INV_AMMO(ent, KEV_NUM))
-		Drop_Special (ent, GET_ITEM(KEV_NUM));
+		Drop_Special(ent, GET_ITEM(KEV_NUM));
 	else if (INV_AMMO(ent, SIL_NUM)) // Silencer last 'cause it's "free"
-			Drop_Special(ent, GET_ITEM(SIL_NUM));
+		Drop_Special(ent, GET_ITEM(SIL_NUM));
 }
-
 
 void Drop_General (edict_t * ent, gitem_t * item)
 {
@@ -423,7 +420,6 @@ void Drop_General (edict_t * ent, gitem_t * item)
 	ent->client->inventory[ITEM_INDEX (item)]--;
 	ValidateSelectedItem (ent);
 }
-
 
 //======================================================================
 qboolean Pickup_Adrenaline (edict_t * ent, edict_t * other)

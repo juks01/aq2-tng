@@ -2004,7 +2004,7 @@ void EquipClient(edict_t * ent)
 
 	client = ent->client;
 
-	if(use_grapple->value)
+	if(use_grapple->value && ctf->value == 1) // Give Grapple in inventory only in CTF mode -JukS-
 		client->inventory[ITEM_INDEX(FindItem("Grapple"))] = 1;
 
 	// Honor changes to wp_flags and itm_flags.
@@ -2173,7 +2173,7 @@ void EquipClientDM(edict_t * ent)
 	int itemNum = 0;
 	client = ent->client;
 
-	if(use_grapple->value)
+	if(use_grapple->value && ctf->value == 1) // Give Grapple in inventory only in CTF mode -JukS-
 		client->inventory[ITEM_INDEX(FindItem("Grapple"))] = 1;
 
 	if (*strtwpn->string)
@@ -2631,9 +2631,10 @@ void ClientBegin(edict_t * ent)
 
 	ClientBeginDeathmatch(ent);
 
-	// Send fast teamplay grappling hook aliases to client -JukS-
+	// Send fast grappling hook aliases to client -JukS-
 	stuffcmd(ent, "alias +hook hook\n");
 	stuffcmd(ent, "alias -hook unhook\n");
+	stuffcmd(ent, "echo Bind +hook to some button to use Grappling Hook with Bandolier!\n"); // TODO: Is this working?
 }
 
 /*
