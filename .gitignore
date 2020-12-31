@@ -25,3 +25,7 @@
 /source/.vs/game/v16
 /source/game.vcxproj*
 /source/Debug
+/source/x64/Release/gamex86.dll.recipe
+/source/x64/Release/game.vcxproj.FileListAbsolute.txt
+/source/Release/gamex86.dll.recipe
+/source/Release/game.vcxproj.FileListAbsolute.txt

@@ -8,16 +8,25 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
 		Ppro|Win32 = Ppro|Win32
+		Ppro|x64 = Ppro|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Debug|Win32.Build.0 = Debug|Win32
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Debug|x64.ActiveCfg = Debug Alpha|x64
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Debug|x64.Build.0 = Debug Alpha|x64
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Ppro|Win32.ActiveCfg = Ppro|Win32
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Ppro|Win32.Build.0 = Ppro|Win32
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Ppro|x64.ActiveCfg = Ppro|x64
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Ppro|x64.Build.0 = Ppro|x64
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Release|Win32.ActiveCfg = Release|Win32
 		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Release|Win32.Build.0 = Release|Win32
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Release|x64.ActiveCfg = Release|x64
+		{2A2DEB59-53A6-9A2D-93CC-18B1793D8783}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

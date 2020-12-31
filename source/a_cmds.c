@@ -247,8 +247,7 @@ void LaserSightThink(edict_t * self)
 	self->nextthink = level.framenum + 1;
 }
 
-void Cmd_New_Reload_f(edict_t * ent)
-{
+void Cmd_New_Reload_f(edict_t * ent) {
 //FB 6/1/99 - refuse to reload during LCA
 	if (lights_camera_action)
 		return;
@@ -256,8 +255,7 @@ void Cmd_New_Reload_f(edict_t * ent)
 }
 
 // Handles weapon reload requests
-void Cmd_Reload_f(edict_t * ent)
-{
+void Cmd_Reload_f(edict_t * ent) {
 	//+BD - If the player is dead, don't bother
 	if (!IS_ALIVE(ent) || !ent->client->weapon)
 		return;
@@ -405,6 +403,15 @@ void Cmd_Reload_f(edict_t * ent)
 		if (ent->client->inventory[ent->client->ammo_index] <= 0) {
 			gi.cprintf(ent, PRINT_HIGH, "Out of ammo\n");
 			return;
+		}
+		break;
+	case GRENADE_NUM: // Added by JukS (grenade "reload")
+		if (ent->client->curr_weap == GRENADE_NUM // TODO: Frame 80 probably wrong -JukS-
+			&& ((ent->client->ps.gunframe >= GRENADE_PIN_FRAME && ent->client->ps.gunframe <= 80 )
+			|| (ent->client->ps.gunframe >= GRENADE_THROW_FIRST
+			&& ent->client->ps.gunframe <= GRENADE_THROW_LAST))) {
+			// do the "repin" -JukS-
+			gi.cprintf(ent, PRINT_HIGH, "Repinning the grenade!\n");
 		}
 		break;
 	default:
