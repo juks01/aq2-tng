@@ -24,3 +24,7 @@
 .#*
 .DS_Store
 ._*
+/.vs
+/Debug
+/source/game.vcxproj.user
+/source/.vs/game/v16

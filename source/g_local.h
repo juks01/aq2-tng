@@ -288,7 +288,7 @@
 #include	"tng_balancer.h"
 #include	"g_grapple.h"
 #define		getEnt(entnum)	(edict_t *)((char *)globals.edicts + (globals.edict_size * entnum))	//AQ:TNG Slicer - This was missing
-#define		GAMEVERSION			"action"	// the "gameversion" client command will print this plus compile date
+#define		GAMEVERSION			"arpg"	// the "gameversion" client command will print this plus compile date
 
 
 #define GMF_CLIENTNUM				0x00000001
